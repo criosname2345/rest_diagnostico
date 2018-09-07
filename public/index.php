@@ -1,12 +1,20 @@
 <?php
+
+use Phalcon\Loader;
+use Phalcon\Mvc\Micro;
 use Phalcon\Di\FactoryDefault;
+use Phalcon\Db\Adapter\Pdo\Mysql as PdoMysql;
+use Phalcon\Session\Adapter\Files as Session;
+use Phalcon\Db\Adapter\Pdo\Postgresql;
+use Phalcon\Http\Response;
+use Phalcon\Events\Event;
+use Phalcon\Events\Manager as EventsManager;
 
 error_reporting(E_ALL);
 
 define('BASE_PATH', dirname(__DIR__));
 define('APP_PATH', BASE_PATH . '/app');
 
-       
 try {
 
     // Use Loader() to autoload our model
@@ -34,32 +42,7 @@ try {
    //*/
    
    $app = new Micro($di);
-   
-// Crear un gestor de eventos
-   // $eventsManager = new EventsManager();
 
-   // $eventsManager->attach(
-   //     'micro:beforeExecuteRoute',
-   //     function (Event $event, $app) {
-   //         if ($app->session->get('auth') === false) {
-   //             $app->flashSession->error("El usuario no esta autorizado");
-   //             $response = new Response();
-   //             // $app->response->redirect('/');
-   //             // $app->response->sendHeaders();
-   //             $response->setJsonContent(
-   //                 [
-   //                     'status'   => 'ERROR',
-   //                     'messages' => 'El usuario no esta autorizado',
-   //                 ]
-   //             );
-   //             // Devolver (false) y detener la operación
-   //             // return false;
-   //         }
-   //     }
-   // );
-
-   // // Enlazar el gestor de eventos a la aplicación
-   // $app->setEventsManager($eventsManager);    
 
    // * Configurar rutas
     
@@ -167,10 +150,7 @@ $app->get(
    }
 );
 
-
-   
-$app->handle();
-   
+$app->handle();  
 
 } catch (\Exception $e) {
    echo $e->getMessage() . '<br>';
