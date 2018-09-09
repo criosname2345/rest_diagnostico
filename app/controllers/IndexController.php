@@ -11,14 +11,14 @@ class IndexController extends ControllerBase
 
     }
 
-
     private function _registerSession($usuario)
     {
         $this->session->set(
-            'auth',
+            'usuario',
             [
-                'id'      => $usuario->id_usuario,
-                'correo'  => $usuario->correo,
+                'id'          => $usuario->id_usuario,
+                'correo'      => $usuario->correo,
+                'id_usuaurio' => $usuario->id_usuario,
             ]
         );
     }
@@ -31,9 +31,6 @@ class IndexController extends ControllerBase
         // Crear una respuesta
         $response = new Response();
         if ($this->request->isPost()) {
-            // Obtener datos desde el usuario
-            // $correo    = $this->request->getPost('email');
-            // $password = $this->request->getPost('password');
 
             $json = $this->request->getJsonRawBody();
 
@@ -55,21 +52,11 @@ class IndexController extends ControllerBase
             if ($usuario !== false) {
                 $this->_registerSession($usuario);
 
-                // $this->flash->success(
-                //     'Bienvenido ' . $usuario->name
-                // );
-
-                // Enviar al controlador 'invoices' si el usuario es válido
-                // return $this->dispatcher->forward(
-                //     [
-                //         'controller' => 'invoices',
-                //         'action'     => 'index',
-                //     ]
-                // );
                 $response->setJsonContent(
                     [
                         'status'   => 'OK',
                         'messages' => 'Usuario autenticado',
+                        'usuario'  => $usuario,
                     ]
                 );
                 return $response;
@@ -84,18 +71,8 @@ class IndexController extends ControllerBase
             );
             return $response;
 
-            // $this->flash->error(
-            //     'Email/Contraseña incorrectos'
-            // );
         }
 
-        // Enviar al formulario de inicio de sesión nuevamente
-        // return $this->dispatcher->forward(
-        //     [
-        //         'controller' => 'session',
-        //         'action'     => 'index',
-        //     ]
-        // );
     }
 
 
