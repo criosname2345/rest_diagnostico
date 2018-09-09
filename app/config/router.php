@@ -13,13 +13,13 @@ $Inicio->post('/aut', 'autenticar');
 
 $app->mount($Inicio);
 
-// Manejador de programas
-// $Programas = new MicroCollection();
-// $Programas->setHandler('ProgramasController', true);
-// $Programas->setPrefix('/programas');
-// $Programas->post('/obtmat', 'obt_materias');
-// // $inicio->get('/add/{payload}', 'add');
-// $app->mount($Programas);
+// Gestion de visitas
+$Visitas = new MicroCollection();
+$Visitas->setHandler('VisitasController', true);
+$Visitas->setPrefix('/visitas');
+$Visitas->post('/obt', 'obt_visita');
+$Visitas->post('/crear', 'crear_visita');
+$app->mount($Visitas);
 
 // Manejador Usuarios
 // $Usuarios = new MicroCollection();
