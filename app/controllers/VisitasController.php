@@ -145,7 +145,7 @@ class VisitasController extends ControllerBase
 
         $us_ses = $this->session->get('usuario');
 
-        $visita->id_usuario = $us_ses[id];
+        $visita->id_usuario = $us_ses['id'];
 
         $categoria = diag\cc\Categoria::findFirst(['id_categoria = ?0',
         'bind' => [ $json->id_categoria ],]);

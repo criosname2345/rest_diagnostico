@@ -18,6 +18,7 @@ class IndexController extends ControllerBase
             [
                 'id'          => $usuario->id_usuario,
                 'correo'      => $usuario->correo,
+                'rol'         => $usuario->id_rol,
             ]
         );
     }

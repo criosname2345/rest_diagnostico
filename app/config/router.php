@@ -21,14 +21,14 @@ $Visitas->post('/obt', 'obt_visita');
 $Visitas->post('/crear', 'crear_visita');
 $app->mount($Visitas);
 
-// Manejador Usuarios
-// $Usuarios = new MicroCollection();
-// $Usuarios->setHandler('UsuariosController', true);
-// $Usuarios->setPrefix('/usuarios');
-// $Usuarios->post('/listarsyl', 'listar_syllabus');
-// // $Usuarios->get('/get/{id}', 'get');
-// // $Usuarios->get('/add/{payload}', 'add');
-// $app->mount($Usuarios);
+// Manejador Empresas
+$Empresas = new MicroCollection();
+$Empresas->setHandler('EmpresasController', true);
+$Empresas->setPrefix('/empresas');
+$Empresas->post('/listar', 'listar_empresas');
+// $Empresas->get('/get/{id}', 'get');
+// $Empresas->get('/add/{payload}', 'add');
+$app->mount($Empresas);
 
 // Manejador de syllabus - versiones - sesiones
 // $Syllabus = new MicroCollection();
