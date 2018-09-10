@@ -186,5 +186,42 @@ class VisitasController extends ControllerBase
 
     }
 
+    public function listar_categorias(){
+
+        // Crear una respuesta
+        $response = new Response();
+        if ($this->request->isPost()) {
+            $json = $this->request->getJsonRawBody();
+            $loger = $this->validar_logueo($json->token);
+            if (!$loger){
+                // Cambiar el HTTP status
+                $response->setStatusCode(409, 'Conflict');
+                $response->setJsonContent(
+                    [
+                        'status'   => 'ERROR',
+                        'messages' => 'Usuario no ha sido autenticado',
+                    ]
+                );
+                return $response;
+            }
+        }else{
+            $response->setStatusCode(404, 'Not Found');
+            return $response;
+        } 
+
+        $categorias = diag\cc\Categoria::find( );
+
+        $response->setJsonContent(
+            [
+                'status'   => 'OK',
+                'messages' => 'Listado de categorias Registradas',
+                'categorias'   => $categorias,
+            ]
+        );    
+
+        return $response;
+
+    }
+
 }
 

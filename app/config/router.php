@@ -19,6 +19,7 @@ $Visitas->setHandler('VisitasController', true);
 $Visitas->setPrefix('/visitas');
 $Visitas->post('/obt', 'obt_visita');
 $Visitas->post('/crear', 'crear_visita');
+$Visitas->post('/categorias', 'listar_categorias');
 $app->mount($Visitas);
 
 // Manejador Empresas
