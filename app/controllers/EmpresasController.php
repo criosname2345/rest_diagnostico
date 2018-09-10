@@ -34,6 +34,38 @@ class EmpresasController extends ControllerBase
              return $response;
          } 
 
+         $us_ses = $this->session->get('usuario');
+
+         if(!isset($us_ses['id_contacto'])){
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'Usuario no contiene contacto',
+                ]
+            );
+            return $response;
+        }
+
+         $contacto = diag\cc\Contacto::findfirst(['id_contacto = ?0',
+         'bind' => [ $us_ses['id_contacto'] ],]);
+ 
+         $empresa_usuario = diag\cc\Empresa::findfirst(['id_empresa = ?0',
+         'bind' => [ $contacto->id_empresa ],]);
+
+         $empresas = diag\cc\Empresa::find(['camara_comercio = ?0',
+         'bind' => [ $empresa_usuario->camara_comercio ],]);
+
+         $response->setJsonContent(
+             [
+                 'status'   => 'OK',
+                 'messages' => 'Empresas del usuario listada',
+                 'empresas'   => $empresas,
+             ]
+         );  
+
+         return $response;
+
     }
 
     public function crear_empresa(){
@@ -84,7 +116,27 @@ class EmpresasController extends ControllerBase
         $empresa->constitucion = $json->constitucion;
         $empresa->ccit = $json->ccit;
         $empresa->es_cc = '';
-        $empresa->camara_comercio = $json->camara_comercio;
+        //traer camara de comercio del usuario
+        $us_ses = $this->session->get('usuario');
+
+        if(!isset($us_ses['id_contacto'])){
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'Usuario no contiene contacto',
+                ]
+            );
+            return $response;
+        }
+
+        $contacto = diag\cc\Contacto::findfirst(['id_contacto = ?0',
+        'bind' => [ $us_ses['id_contacto'] ],]);
+
+        $empresa_usuario = diag\cc\Empresa::findfirst(['id_empresa = ?0',
+        'bind' => [ $contacto->id_empresa ],]);
+
+        $empresa->camara_comercio = $empresa_usuario->camara_comercio;
         // $empresa->id_diagnostico = $json->id_diagnostico;
 
         if ($empresa->create() === false) {
@@ -93,7 +145,7 @@ class EmpresasController extends ControllerBase
                 [
                     'status'   => 'ERROR',
                     'messages' => 'No se ha podido registrar la empresa',
-                    'visita'   => $empresa,
+                    'empresa'   => $empresa,
                 ]
             );           
         }else{
@@ -101,7 +153,7 @@ class EmpresasController extends ControllerBase
                 [
                     'status'   => 'OK',
                     'messages' => 'Se registro la empresa correctamente',
-                    'visita'   => $empresa,
+                    'empresa'   => $empresa,
                 ]
             );              
         }

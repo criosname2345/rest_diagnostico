@@ -27,6 +27,7 @@ $Empresas->setHandler('EmpresasController', true);
 $Empresas->setPrefix('/empresas');
 $Empresas->post('/listar', 'listar_empresas');
 $Empresas->post('/crear', 'crear_empresa');
+$Empresas->post('/listar', 'listar_empresas');
 // $Empresas->get('/get/{id}', 'get');
 // $Empresas->get('/add/{payload}', 'add');
 $app->mount($Empresas);
