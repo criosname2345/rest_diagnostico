@@ -99,6 +99,13 @@ class Empresa extends \Phalcon\Mvc\Model
     protected $id_diagnostico;
 
     /**
+     *
+     * @var integer
+     * @Column(column="actividad_economica", type="integer", length=11, nullable=false)
+     */
+    protected $actividad_economica;
+
+    /**
      * Method to set the value of field id_empresa
      *
      * @param integer $id_empresa
@@ -268,6 +275,19 @@ class Empresa extends \Phalcon\Mvc\Model
     }
 
     /**
+     * Method to set the value of field actividad_economica
+     *
+     * @param integer $actividad_economica
+     * @return $this
+     */
+    public function setActividadEconomica($actividad_economica)
+    {
+        $this->actividad_economica = $actividad_economica;
+
+        return $this;
+    }
+
+    /**
      * Returns the value of field id_empresa
      *
      * @return integer
@@ -398,6 +418,16 @@ class Empresa extends \Phalcon\Mvc\Model
     }
 
     /**
+     * Returns the value of field actividad_economica
+     *
+     * @return integer
+     */
+    public function getActividadEconomica()
+    {
+        return $this->actividad_economica;
+    }
+
+    /**
      * Initialize method for model.
      */
     public function initialize()
@@ -466,7 +496,8 @@ class Empresa extends \Phalcon\Mvc\Model
             'ccit' => 'ccit',
             'es_cc' => 'es_cc',
             'camara_comercio' => 'camara_comercio',
-            'id_diagnostico' => 'id_diagnostico'
+            'id_diagnostico' => 'id_diagnostico',
+            'actividad_economica' => 'actividad_economica'
         ];
     }
 

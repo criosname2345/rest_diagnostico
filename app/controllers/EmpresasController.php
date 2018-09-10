@@ -116,6 +116,7 @@ class EmpresasController extends ControllerBase
         $empresa->constitucion = $json->constitucion;
         $empresa->ccit = $json->ccit;
         $empresa->es_cc = '';
+        $empresa->actividad_economica = $json->ciu;
         //traer camara de comercio del usuario
         $us_ses = $this->session->get('usuario');
 
