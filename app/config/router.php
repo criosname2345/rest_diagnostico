@@ -26,6 +26,7 @@ $Empresas = new MicroCollection();
 $Empresas->setHandler('EmpresasController', true);
 $Empresas->setPrefix('/empresas');
 $Empresas->post('/listar', 'listar_empresas');
+$Empresas->post('/crear', 'crear_empresa');
 // $Empresas->get('/get/{id}', 'get');
 // $Empresas->get('/add/{payload}', 'add');
 $app->mount($Empresas);

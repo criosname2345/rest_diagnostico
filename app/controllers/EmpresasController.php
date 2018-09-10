@@ -59,6 +59,19 @@ class EmpresasController extends ControllerBase
              return $response;
         } 
 
+        $us_ses = $this->session->get('usuario');
+
+        if($us_ses['rol'] !== '1'){
+            // Cambiar el HTTP status
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'El usuario no tiene permisos para registrar una empresa',
+                ]
+            );
+            return $response;            
+        }
 
         $empresa =  new diag\cc\Empresa();
         $empresa->razon_social = $json->razon_social;
@@ -70,9 +83,30 @@ class EmpresasController extends ControllerBase
         $empresa->direccion = $json->direccion;
         $empresa->constitucion = $json->constitucion;
         $empresa->ccit = $json->ccit;
-        $empresa->es_cc = '1';
-        $empresa->web = $json->web;
-        $empresa->web = $json->web;
+        $empresa->es_cc = '';
+        $empresa->camara_comercio = $json->camara_comercio;
+        // $empresa->id_diagnostico = $json->id_diagnostico;
+
+        if ($empresa->create() === false) {
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'No se ha podido registrar la empresa',
+                    'visita'   => $empresa,
+                ]
+            );           
+        }else{
+            $response->setJsonContent(
+                [
+                    'status'   => 'OK',
+                    'messages' => 'Se registro la empresa correctamente',
+                    'visita'   => $empresa,
+                ]
+            );              
+        }
+
+        return $response;
         
     }
 
