@@ -38,5 +38,7 @@ $Diagnostico->setHandler('DiagnosticosController', true);
 $Diagnostico->setPrefix('/diagnostico');
 $Diagnostico->post('/crear', 'crear_diagnostico');
 $Diagnostico->post('/pregunta', 'grabar_pregunta');
+$Diagnostico->post('/listar_p', 'listar_preguntas');
+$Diagnostico->post('/reg_intento', 'realizar_intento');
 $app->mount($Diagnostico);
 
