@@ -4,3 +4,5 @@ Fri 7 03:12:59 Cristian-Rios php: [ERROR] 1049: SQLSTATE[HY000] [1049] Unknown d
 Fri 7 03:13:06 Cristian-Rios php: [ERROR] 1049: SQLSTATE[HY000] [1049] Unknown database 'db_diagnostico' in C:\xampp\phalcon-devtools-master\scripts\Phalcon\Initializable.php on line 562
 Fri 7 03:14:26 Cristian-Rios php: [ERROR] 1049: SQLSTATE[HY000] [1049] Unknown database 'db_diagnostico' in C:\xampp\phalcon-devtools-master\scripts\Phalcon\Initializable.php on line 562
 Fri 7 03:16:48 Cristian-Rios php: [ERROR] 1049: SQLSTATE[HY000] [1049] Unknown database 'db_diagnostico' in C:\xampp\phalcon-devtools-master\scripts\Phalcon\Initializable.php on line 562
+Thu 20 08:00:26 Cristian-Rios php: [ERROR] 1045: SQLSTATE[HY000] [1045] Access denied for user 'twkxomfm_testU'@'localhost' (using password: YES) in C:\xampp\phalcon-devtools-master\scripts\Phalcon\Initializable.php on line 562
+Thu 20 08:00:49 Cristian-Rios php: [ERROR] 1045: SQLSTATE[HY000] [1045] Access denied for user 'twkxomfm_testU'@'localhost' (using password: YES) in C:\xampp\phalcon-devtools-master\scripts\Phalcon\Initializable.php on line 562

@@ -113,6 +113,7 @@ class EmpresasController extends ControllerBase
         $empresa->repr_legal = $json->repr_legal;
         $empresa->ger_general = $json->ger_general;
         $empresa->direccion = $json->direccion;
+        $empresa->ciudad = $json->ciudad;
         $empresa->constitucion = $json->constitucion;
         $empresa->ccit = $json->ccit;
         $empresa->es_cc = '';

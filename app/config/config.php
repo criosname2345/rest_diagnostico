@@ -14,6 +14,12 @@ return new \Phalcon\Config([
         'password'    => '',
         'dbname'      => 'bd_diagnostico',
         'charset'     => 'utf8',
+        // 'adapter'     => 'Mysql',
+        // 'host'        => 'localhost',
+        // 'username'    => 'twkxomfm_testU',
+        // 'password'    => 'TestU1234*@',
+        // 'dbname'      => 'twkxomfm_bd_diagnostico_test',
+        // 'charset'     => 'utf8',
     ],
     'application' => [
         'appDir'         => APP_PATH . '/',

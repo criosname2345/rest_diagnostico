@@ -66,6 +66,13 @@ class Empresa extends \Phalcon\Mvc\Model
     /**
      *
      * @var string
+     * @Column(column="ciudad", type="string", length=15, nullable=false)
+     */
+    protected $ciudad;
+
+    /**
+     *
+     * @var string
      * @Column(column="constitucion", type="string", nullable=false)
      */
     protected $constitucion;
@@ -205,6 +212,19 @@ class Empresa extends \Phalcon\Mvc\Model
     public function setDireccion($direccion)
     {
         $this->direccion = $direccion;
+
+        return $this;
+    }
+
+    /**
+     * Method to set the value of field ciudad
+     *
+     * @param string $ciudad
+     * @return $this
+     */
+    public function setCiudad($ciudad)
+    {
+        $this->ciudad = $ciudad;
 
         return $this;
     }
@@ -368,6 +388,16 @@ class Empresa extends \Phalcon\Mvc\Model
     }
 
     /**
+     * Returns the value of field ciudad
+     *
+     * @return string
+     */
+    public function getCiudad()
+    {
+        return $this->ciudad;
+    }
+
+    /**
      * Returns the value of field constitucion
      *
      * @return string
@@ -492,6 +522,7 @@ class Empresa extends \Phalcon\Mvc\Model
             'repr_legal' => 'repr_legal',
             'ger_general' => 'ger_general',
             'direccion' => 'direccion',
+            'ciudad' => 'ciudad',
             'constitucion' => 'constitucion',
             'ccit' => 'ccit',
             'es_cc' => 'es_cc',
