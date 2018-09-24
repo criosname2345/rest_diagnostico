@@ -24,8 +24,8 @@ class ControllerBase extends Controller
 
     }
 
-    public function obtener_camara_comercio(){
-        //traer camara de comercio del usuario
+    public function obtener_empresa(){
+        //traer empresa del usuario
         $us_ses = $this->session->get('usuario');
 
         if(!isset($us_ses['id_contacto'])){
@@ -45,7 +45,7 @@ class ControllerBase extends Controller
         $empresa_usuario = diag\cc\Empresa::findfirst(['id_empresa = ?0',
         'bind' => [ $contacto->id_empresa ],]);
 
-        return $empresa_usuario->camara_comercio;
+        return $empresa_usuario;
     }
         //Traer id_diagnostico teniendo ya la camara de comercio
     public function obtener_diagnostico($camara_comercio){

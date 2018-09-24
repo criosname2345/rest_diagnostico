@@ -336,7 +336,7 @@ class DiagnosticosController extends ControllerBase
             return $response;
         }       
         $intento->resultado = $json->resultado;
-        //traer camara de comercio del usuario
+        //traer empresa del usuario
         $us_ses = $this->session->get('usuario');
 
         if(!isset($us_ses['id_contacto'])){
@@ -356,23 +356,25 @@ class DiagnosticosController extends ControllerBase
         $empresa_usuario = diag\cc\Empresa::findfirst(['id_empresa = ?0',
         'bind' => [ $contacto->id_empresa ],]);
 
-        //Si la empresa no es camara de comercio no puede crear intento diagnostico
-        if($empresa_usuario->es_cc != 1){
+        // //Si la empresa no es camara de comercio no puede crear intento diagnostico
+        // if($empresa_usuario->es_cc != 1){
+        //     $response->setStatusCode(409, 'Conflict');
+        //     $response->setJsonContent(
+        //         [
+        //             'status'   => 'ERROR',
+        //             'messages' => 'La empresa '.$empresa->razon_social.' no es camara de comercio',
+        //         ]
+        //     );
+        //     return $response;            
+        // }
+        $CamCom = diag\cc\Empresa::findfirst($empresa_usuario->camara_comercio);
+        //Validar que la camara de comercio de la empresa si tenga diagnostico
+        if($CamCom->id_diagnostico == null){
             $response->setStatusCode(409, 'Conflict');
             $response->setJsonContent(
                 [
                     'status'   => 'ERROR',
-                    'messages' => 'La empresa '.$empresa->razon_social.' no es camara de comercio',
-                ]
-            );
-            return $response;            
-        }
-        if($empresa_usuario->id_diagnostico == null){
-            $response->setStatusCode(409, 'Conflict');
-            $response->setJsonContent(
-                [
-                    'status'   => 'ERROR',
-                    'messages' => 'La empresa '.$empresa->razon_social.' no tiene diagnostico',
+                    'messages' => 'La camara de comercio '.$CamCom->razon_social.' no tiene diagnostico',
                 ]
             );
             return $response;            
@@ -465,6 +467,97 @@ class DiagnosticosController extends ControllerBase
         
         return $response;            
         
+    }
+
+    public function listar_intentos(){
+        // Crear una respuesta
+        $response = new Response();
+        if ($this->request->isPost()) {
+                $json = $this->request->getJsonRawBody();
+                $loger = $this->validar_logueo($json->token);
+                if (!$loger){
+                    // Cambiar el HTTP status
+                    $response->setStatusCode(409, 'Conflict');
+                    $response->setJsonContent(
+                        [
+                            'status'   => 'ERROR',
+                            'messages' => 'Usuario no ha sido autenticado',
+                        ]
+                    );
+                    return $response;
+            }
+        }else{
+                $response->setStatusCode(404, 'Not Found');
+                return $response;
+        }
+        
+        $intentos = diag\cc\Intento::find(['id_empresa = ?0',
+        'bind' => [ $json->id_empresa ],]);        
+        
+        $response->setJsonContent(
+            [
+                'status'     => 'OK',
+                'messages'   => 'Intentos realizados con la empresa '.$json->id_empresa,
+                'Intentos'   => $intentos,
+            ]
+        );           
+        
+        return $response;              
+    }
+
+    public function obt_respuestas_intento(){
+         // Crear una respuesta
+         $response = new Response();
+         if ($this->request->isPost()) {
+                 $json = $this->request->getJsonRawBody();
+                 $loger = $this->validar_logueo($json->token);
+                 if (!$loger){
+                     // Cambiar el HTTP status
+                     $response->setStatusCode(409, 'Conflict');
+                     $response->setJsonContent(
+                         [
+                             'status'   => 'ERROR',
+                             'messages' => 'Usuario no ha sido autenticado',
+                         ]
+                     );
+                     return $response;
+             }
+         }else{
+                 $response->setStatusCode(404, 'Not Found');
+                 return $response;
+         }
+         
+         $intento = diag\cc\Intento::findFirst(['id_empresa = ?0',
+         'bind' => [ $json->id_intento ],]);
+         if (!isset($json->id_intento) || $intento === false){
+            // Cambiar el HTTP status
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'Intento no existe '.$json->id_intento,
+                ]
+            );
+            return $response;
+        }
+
+        $respuestas_int = diag\cc\IntentoRespuesta::find(['id_intento = ?0',
+        'bind' => [ $intento->id_intento ],]); 
+
+        $respuestas = array();        
+        foreach($respuestas_int as $int_res){
+            $respuestas[] = diag\cc\OpcRespuesta::findFirst($int_res->id_respuesta);
+        }
+
+        $response->setJsonContent(
+            [
+                'status'     => 'OK',
+                'messages'   => 'Respuestas del intento '.$intento->id_intento,
+                'respuestas'   => $respuestas,
+            ]
+        );           
+        
+        return $response;     
     }
 
 }
