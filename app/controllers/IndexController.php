@@ -52,12 +52,15 @@ class IndexController extends ControllerBase
 
             if ($usuario !== false) {
                 $this->_registerSession($usuario);
-
+                $CamCom = $this->obtener_camara_comercio();
+                $diagnostico = $this->obtener_diagnostico($CamCom);
                 $response->setJsonContent(
                     [
                         'status'   => 'OK',
                         'messages' => 'Usuario autenticado',
                         'usuario'  => $usuario,
+                        'Camara_Comercio' => $CamCom,
+                        'Diagnostico'     => $diagnostico,
                     ]
                 );
                 return $response;
