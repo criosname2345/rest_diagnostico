@@ -40,5 +40,6 @@ $Diagnostico->post('/crear', 'crear_diagnostico');
 $Diagnostico->post('/pregunta', 'grabar_pregunta');
 $Diagnostico->post('/listar_p', 'listar_preguntas');
 $Diagnostico->post('/reg_intento', 'realizar_intento');
+$Diagnostico->post('/grabar_respuestas', 'grabar_resp_intento');
 $app->mount($Diagnostico);
 

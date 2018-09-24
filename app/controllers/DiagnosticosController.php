@@ -279,8 +279,13 @@ class DiagnosticosController extends ControllerBase
 
         foreach($preguntas as $pregunta){
 
-            $respuestas[$pregunta->id_pregunta] = diag\cc\OpcRespuesta::find(['id_pregunta = ?0',
-            'bind' => [ $pregunta->id_pregunta ],]);
+            $respuestas[] = [
+            'id_pregunta'    => $pregunta->id_pregunta ,
+            'tipo'           => $pregunta->tipo ,
+            'txt_pregunta'   => $pregunta->txt_pregunta ,
+            'id_diagnostico' => $pregunta->id_diagnostico ,
+            'respuestas' => diag\cc\OpcRespuesta::find(['id_pregunta = ?0',
+            'bind' => [ $pregunta->id_pregunta ],]), ];
 
         }
 
@@ -288,8 +293,7 @@ class DiagnosticosController extends ControllerBase
             [
                 'status'   => 'OK',
                 'messages' => 'Preguntas diagnostico '.$json->id_diagnostico ,
-                'Preguntas' => $preguntas ,
-                'Respuestas' => $respuestas ,
+                'Preguntas' => $respuestas ,
             ]
             );         
                                               
@@ -399,6 +403,68 @@ class DiagnosticosController extends ControllerBase
         
         return $response;        
 
+    }
+
+    public function grabar_resp_intento(){
+        // Crear una respuesta
+        $response = new Response();
+        if ($this->request->isPost()) {
+                $json = $this->request->getJsonRawBody();
+                $loger = $this->validar_logueo($json->token);
+                if (!$loger){
+                    // Cambiar el HTTP status
+                    $response->setStatusCode(409, 'Conflict');
+                    $response->setJsonContent(
+                        [
+                            'status'   => 'ERROR',
+                            'messages' => 'Usuario no ha sido autenticado',
+                        ]
+                    );
+                    return $response;
+            }
+        }else{
+                $response->setStatusCode(404, 'Not Found');
+                return $response;
+        }
+
+        $intento = diag\cc\Intento::findfirst(['id_intento = ?0',
+        'bind' => [ $json->id_intento ],]);
+        if($json->id_intento === null || $intento === false ){
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'no existe el intento '.$json->id_intento,
+                ]
+            );
+            return $response;            
+        }
+        
+        $respuestas_grabadas = array();
+        $respuestas_errores = array();
+        foreach($json->respuestas as $respuesta_json){
+            $intento_resp = new diag\cc\IntentoRespuesta();
+            $intento_resp->id_respuesta = $respuesta_json->id_respuesta;
+            $intento_resp->id_intento = $json->id_intento;
+            if ($intento_resp->create() === false) {
+                $respuestas_errores[] = $respuesta_json->id_respuesta;
+            }else{
+                $respuestas_grabadas[] = $respuesta_json->id_respuesta;
+            }
+            unset($intento_resp);
+        }
+
+        $response->setJsonContent(
+            [
+                'status'   => 'OK',
+                'messages'              => 'Respuestas grabadas',
+                'respuestas_grabadas'   => $respuestas_grabadas,
+                'respuestas_errores'    => $respuestas_errores,
+            ]
+        );           
+        
+        return $response;            
+        
     }
 
 }
