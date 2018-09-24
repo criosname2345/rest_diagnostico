@@ -381,7 +381,7 @@ class DiagnosticosController extends ControllerBase
         }
 
         $intento->id_diagnostico = $empresa_usuario->id_diagnostico;
-        $intento->id_empresa =  $empresa_usuario->id_empresa;
+        $intento->id_empresa =  $json->id_empresa;
 
         if ($intento->create() === false) {
             $response->setStatusCode(409, 'Conflict');
