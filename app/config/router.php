@@ -22,6 +22,14 @@ $Visitas->post('/crear', 'crear_visita');
 $Visitas->post('/categorias', 'listar_categorias');
 $app->mount($Visitas);
 
+// Gestion de contactos
+$Contactos = new MicroCollection();
+$Contactos->setHandler('ContactosController', true);
+$Contactos->setPrefix('/contactos');
+$Contactos->post('/crear', 'crear_contacto');
+$Contactos->post('/listar', 'listar_contactos');
+$app->mount($Contactos);
+
 // Manejador Empresas
 $Empresas = new MicroCollection();
 $Empresas->setHandler('EmpresasController', true);
