@@ -54,7 +54,7 @@ class VisitasController extends ControllerBase
         return $response;
     }
 
-    public function obt_visitas(){
+    public function listar_visitas(){
         // Crear una respuesta
         $response = new Response();
         if ($this->request->isPost()) {
@@ -76,7 +76,8 @@ class VisitasController extends ControllerBase
             return $response;
         }     
 
-        $visitas = diag\cc\Visita::find();
+        $visitas = diag\cc\Visita::find(['id_empresa = ?0',
+        'bind' => [ $json->id_empresa ],]);
 
         $response->setJsonContent(
             [

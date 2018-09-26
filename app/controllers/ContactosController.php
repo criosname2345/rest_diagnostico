@@ -35,7 +35,7 @@ class ContactosController extends ControllerBase
         $contacto->p_apellido = $json->p_apellido;
         $contacto->s_apellido = $json->s_apellido;
         $contacto->tipo_doc = $json->tipo_doc;
-        $contacto->correo = $json->correo;
+        $contacto->correo = $json->correocontacto;
         $contacto->direccion = $json->direccion;
         $contacto->pais = $json->pais;
         $contacto->depto = $json->depto;
