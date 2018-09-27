@@ -582,7 +582,30 @@ class DiagnosticosController extends ControllerBase
                  return $response;
          }
 
-         
+         $intento = diag\cc\Intento::findfirst(['id_intento = ?0',
+         'bind' => [ $json->id_intento ],]); 
+
+         if ($intento === false){
+            // Cambiar el HTTP status
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'Intento no existe',
+                ]
+            );
+            return $response;
+        }
+
+         $int_repuestas = diag\cc\IntentoRespuesta::find(['id_intento = ?0',
+         'bind' => [ $intento->id_intento ],]); 
+
+         $repuestas = array() ;
+
+         foreach($int_repuestas as $intr){
+            $repuestas = diag\cc\OpcRespuesta::findfirst(['id_respuesta = ?0',
+            'bind' => [ $intr->id_respuesta ],]);           
+         }
 
         
     }
