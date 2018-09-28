@@ -628,7 +628,7 @@ class DiagnosticosController extends ControllerBase
          $preguntas_tot = diag\cc\Pregunta::find(['id_diagnostico = ?0',
                         'bind' => [ $intento->id_diagnostico ],]); 
          foreach($preguntas_tot as $pr_tot){
-            $tot_cat[$pr_tot->id_categoria] = $tot_cat[$pr_tot->id_categoria] + 1;
+            $tot_cat[$pr_tot->id_categoria] ++;
          }
 
          //Armar arreglo final
