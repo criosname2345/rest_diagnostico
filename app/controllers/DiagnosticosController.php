@@ -600,12 +600,44 @@ class DiagnosticosController extends ControllerBase
          $int_repuestas = diag\cc\IntentoRespuesta::find(['id_intento = ?0',
          'bind' => [ $intento->id_intento ],]); 
 
-         $repuestas = array() ;
-
          foreach($int_repuestas as $intr){
-            $repuestas = diag\cc\OpcRespuesta::findfirst(['id_respuesta = ?0',
+            $respuestas[] = diag\cc\OpcRespuesta::findfirst(['id_respuesta = ?0',
             'bind' => [ $intr->id_respuesta ],]);           
          }
+         //Obtener preguntas contestadas bien en el intento
+         foreach($respuestas as $repuesta){
+             $sumatoria[$repuesta->id_pregunta] = $sumatoria[$repuesta->id_pregunta] + $repuesta->puntaje;
+             if($sumatoria[$repuesta->id_pregunta] >= 100){
+                $preguntas[] = diag\cc\Pregunta::findfirst(['id_pregunta = ?0',
+                'bind' => [ $repuesta->id_pregunta ],]); 
+             }
+         }
+
+         //Obtener total de preguntas por categoria
+         $preguntas_tot = diag\cc\Pregunta::find(['id_diagnostico = ?0',
+                        'bind' => [ $intento->id_diagnostico ],]); 
+         foreach($preguntas_tot as $pr_tot){
+            $tot_cat[$pr_tot->id_categoria] = $tot_cat[$pr_tot->id_categoria] + 1;
+         }
+
+         //Armar arreglo final
+         foreach($preguntas as $pregunta){
+            $categoria = diag\cc\Categoria::findfirst($pregunta->id_categoria); 
+            $resultado[$pregunta->id_categoria] = $resultado[$pregunta->id_categoria] + 1 ;
+            $set_resultados[$categoria->titulo] = ['total_bien'      => $resultado[$pregunta->id_categoria],
+                                                   'total_preguntas' => $tot_cat[$pregunta->id_categoria],];
+         }
+
+         $response->setJsonContent(
+            [
+                'status'     => 'OK',
+                'messages'   => 'Puntajes por categoria',
+                'categoria_puntaje'  => $set_resultados,
+                'resultado'   => $intento->resultado,
+            ]
+        );           
+        
+        return $response;            
 
         
     }
