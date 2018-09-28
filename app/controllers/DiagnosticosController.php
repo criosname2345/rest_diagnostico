@@ -625,17 +625,17 @@ class DiagnosticosController extends ControllerBase
          }
 
          //Obtener total de preguntas por categoria
-        //  $preguntas_tot = diag\cc\Pregunta::find(['id_diagnostico = ?0',
-        //                 'bind' => [ $intento->id_diagnostico ],]); 
-        //  foreach($preguntas_tot as $pr_tot){
-        //      if( isset( $tot_cat[$pr_tot->id_categoria] ){
-        //         $tot_cat[$pr_tot->id_categoria] ++ ;
-        //      }else{
-        //         $tot_cat[$pr_tot->id_categoria] = 1 ;
-        //      }      
-        //  }
+         $preguntas_tot = diag\cc\Pregunta::find(['id_diagnostico = ?0',
+                        'bind' => [ $intento->id_diagnostico ],]); 
+         foreach($preguntas_tot as $pr_tot){
+             if( isset( $tot_cat[$pr_tot->id_categoria] ){
+                $tot_cat[$pr_tot->id_categoria] ++ ;
+             }else{
+                $tot_cat[$pr_tot->id_categoria] = 1 ;
+             }      
+         }
 
-        //  //Armar arreglo final
+         //Armar arreglo final
         //  foreach($preguntas as $pregunta){
         //     $categoria = diag\cc\Categoria::findfirst($pregunta->id_categoria);
         //     if( isset( $resultado[$pregunta->id_categoria] ){
@@ -657,7 +657,6 @@ class DiagnosticosController extends ControllerBase
         );           
         
         return $response;            
-
         
     }
 
