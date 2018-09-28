@@ -597,9 +597,12 @@ class DiagnosticosController extends ControllerBase
             return $response;
         }
         //Arreglos
-        $sumatoria = array();
-        $tot_cat = array();
+        $sumatoria      = array();
+        $tot_cat        = array();
         $set_resultados = array();
+        $respuestas     = array();
+        $resultado      = array();
+        $preguntas      = array();
 
          $int_repuestas = diag\cc\IntentoRespuesta::find(['id_intento = ?0',
          'bind' => [ $intento->id_intento ],]); 
@@ -609,11 +612,11 @@ class DiagnosticosController extends ControllerBase
             'bind' => [ $intr->id_respuesta ],]);           
          }
          //Obtener preguntas contestadas bien en el intento
-         foreach($respuestas as $repuesta){
-             $sumatoria[$repuesta->id_pregunta] = $sumatoria[$repuesta->id_pregunta] + $repuesta->puntaje;
-             if($sumatoria[$repuesta->id_pregunta] >= 100){
+         foreach($respuestas as $respuesta){
+             $sumatoria[$respuesta->id_pregunta] = $sumatoria[$respuesta->id_pregunta] + $respuesta->puntaje;
+             if($sumatoria[$respuesta->id_pregunta] >= 100){
                 $preguntas[] = diag\cc\Pregunta::findfirst(['id_pregunta = ?0',
-                'bind' => [ $repuesta->id_pregunta ],]); 
+                'bind' => [ $respuesta->id_pregunta ],]); 
              }
          }
 
