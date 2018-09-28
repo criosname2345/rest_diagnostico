@@ -613,7 +613,11 @@ class DiagnosticosController extends ControllerBase
          }
          //Obtener preguntas contestadas bien en el intento
          foreach($respuestas as $respuesta){
-             $sumatoria[$respuesta->id_pregunta] = $sumatoria[$respuesta->id_pregunta] + $respuesta->puntaje;
+             if(isset($sumatoria[$respuesta->id_pregunta])){
+                $sumatoria[$respuesta->id_pregunta] ++;
+             }else{
+                $sumatoria[$respuesta->id_pregunta] = 1;
+             }
              if($sumatoria[$respuesta->id_pregunta] >= 100){
                 $preguntas[] = diag\cc\Pregunta::findfirst(['id_pregunta = ?0',
                 'bind' => [ $respuesta->id_pregunta ],]); 
@@ -630,7 +634,7 @@ class DiagnosticosController extends ControllerBase
          //Armar arreglo final
          foreach($preguntas as $pregunta){
             $categoria = diag\cc\Categoria::findfirst($pregunta->id_categoria); 
-            $resultado[$pregunta->id_categoria] = $resultado[$pregunta->id_categoria] + 1 ;
+            $resultado[$pregunta->id_categoria] ++;
             $set_resultados[$categoria->titulo] = ['total_bien'      => $resultado[$pregunta->id_categoria],
                                                    'total_preguntas' => $tot_cat[$pregunta->id_categoria],];
          }
