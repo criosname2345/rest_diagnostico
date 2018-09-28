@@ -652,6 +652,10 @@ class DiagnosticosController extends ControllerBase
                 'status'     => 'OK',
                 'messages'   => 'Puntajes por categoria',
                 'categoria_puntaje'  => $set_resultados,
+                'int_respuesta' => $int_repuestas,
+                'respuestas'   => $respuestas,
+                'suma'        => $sumatoria,
+                'preguntas_tot'  => $preguntas_tot,
                 'resultado'   => $intento->resultado,
             ]
         );           
