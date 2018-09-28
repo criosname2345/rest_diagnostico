@@ -635,16 +635,22 @@ class DiagnosticosController extends ControllerBase
              }      
          }
 
-         //Armar arreglo final
+         //Preguntas correctas sumar
          foreach($preguntas as $pregunta){
-            $categoria = diag\cc\Categoria::findfirst($pregunta->id_categoria);
             if( isset($resultado[$pregunta->id_categoria]) ){
                 $resultado[$pregunta->id_categoria] ++ ;
             }else{
                 $resultado[$pregunta->id_categoria] = 1 ;
             }
-            $set_resultados[$categoria->titulo] = ['total_bien'      => $resultado[$pregunta->id_categoria],
-                                                   'total_preguntas' => $tot_cat[$pregunta->id_categoria],];
+        }
+         //Armar arreglo final
+         foreach($preguntas_tot as $pregunta_tot){
+            $categoria = diag\cc\Categoria::findfirst($pregunta_tot->id_categoria);
+            if( !isset($resultado[$pregunta_tot->id_categoria]) ){
+                $resultado[$pregunta_tot->id_categoria] = 0;
+            }
+            $set_resultados[$categoria->titulo] = ['total_bien'      => $resultado[$pregunta_tot->id_categoria],
+                                                   'total_preguntas' => $tot_cat[$pregunta_tot->id_categoria],];
          }
 
          $response->setJsonContent(
