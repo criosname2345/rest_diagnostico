@@ -614,9 +614,9 @@ class DiagnosticosController extends ControllerBase
          //Obtener preguntas contestadas bien en el intento
          foreach($respuestas as $respuesta){
              if(isset($sumatoria[$respuesta->id_pregunta])){
-                $sumatoria[$respuesta->id_pregunta] ++;
+                $sumatoria[$respuesta->id_pregunta] += $respuesta->puntaje;
              }else{
-                $sumatoria[$respuesta->id_pregunta] = 1;
+                $sumatoria[$respuesta->id_pregunta] = $respuesta->puntaje;
              }
              if($sumatoria[$respuesta->id_pregunta] >= 100){
                 $preguntas[] = diag\cc\Pregunta::findfirst(['id_pregunta = ?0',
