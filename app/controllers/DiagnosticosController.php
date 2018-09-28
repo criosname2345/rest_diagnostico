@@ -492,7 +492,8 @@ class DiagnosticosController extends ControllerBase
         }
         
         $intentos = diag\cc\Intento::find(['id_empresa = ?0',
-        'bind' => [ $json->id_empresa ],]);        
+        'bind' => [ $json->id_empresa ],
+        'order' => 'id_intento DESC',]);        
         
         $response->setJsonContent(
             [

@@ -77,7 +77,24 @@ class VisitasController extends ControllerBase
         }     
 
         $visitas = diag\cc\Visita::find(['id_empresa = ?0',
-        'bind' => [ $json->id_empresa ],]);
+        'bind' => [ $json->id_empresa ],
+        'order' => 'id_visita DESC',]);
+
+        $salida = array();
+        foreach($visitas as $visita){
+            $categoria = diag\cc\Categoria::findfirst($visita->id_categoria);
+            $usua_vis  = diag\cc\Usuario::findfirst($visita->id_usuario);
+            $cont_usu  = diag\cc\Contacto::findfirst($usua_vis->id_contacto);
+            $salida[] = ['id_visita' => $visita->id_visita,
+                         'fecha' => $visita->fecha,
+                         'comentario' => $visita->comentario,
+                         'id_empresa' => $visita->id_empresa,
+                         'id_usuario' => $visita->id_usuario,
+                         'id_categoria' => $visita->id_categoria,
+                         'nombre_categoria' => $categoria->titulo,
+                         'nombre_usuario'   => $cont_usu->nombre.' '.$cont_usu->p_apellido,
+                        ];
+        }
 
         $response->setJsonContent(
             [
