@@ -656,6 +656,10 @@ class DiagnosticosController extends ControllerBase
                 'respuestas'   => $respuestas,
                 'suma'        => $sumatoria,
                 'preguntas_tot'  => $preguntas_tot,
+                'preguntas'      => $preguntas,
+                'tot_cat'     => $tot_cat,
+                'categoria'   => $categoria,
+                'result'      => $resultado,
                 'resultado'   => $intento->resultado,
             ]
         );           
