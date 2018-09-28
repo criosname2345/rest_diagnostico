@@ -628,24 +628,24 @@ class DiagnosticosController extends ControllerBase
          $preguntas_tot = diag\cc\Pregunta::find(['id_diagnostico = ?0',
                         'bind' => [ $intento->id_diagnostico ],]); 
          foreach($preguntas_tot as $pr_tot){
-             if( isset( $tot_cat[$pr_tot->id_categoria] ){
-                $tot_cat[$pr_tot->id_categoria] ++ ;
+             if(isset( $tot_cat[$pr_tot->id_categoria]) ){
+                $tot_cat[$pr_tot->id_categoria] += 1 ;
              }else{
                 $tot_cat[$pr_tot->id_categoria] = 1 ;
              }      
          }
 
          //Armar arreglo final
-        //  foreach($preguntas as $pregunta){
-        //     $categoria = diag\cc\Categoria::findfirst($pregunta->id_categoria);
-        //     if( isset( $resultado[$pregunta->id_categoria] ){
-        //         $resultado[$pregunta->id_categoria] ++ ;
-        //     }else{
-        //         $resultado[$pregunta->id_categoria] = 1 ;
-        //     }
-        //     $set_resultados[$categoria->titulo] = ['total_bien'      => $resultado[$pregunta->id_categoria],
-        //                                            'total_preguntas' => $tot_cat[$pregunta->id_categoria],];
-        //  }
+         foreach($preguntas as $pregunta){
+            $categoria = diag\cc\Categoria::findfirst($pregunta->id_categoria);
+            if( isset($resultado[$pregunta->id_categoria]) ){
+                $resultado[$pregunta->id_categoria] ++ ;
+            }else{
+                $resultado[$pregunta->id_categoria] = 1 ;
+            }
+            $set_resultados[$categoria->titulo] = ['total_bien'      => $resultado[$pregunta->id_categoria],
+                                                   'total_preguntas' => $tot_cat[$pregunta->id_categoria],];
+         }
 
          $response->setJsonContent(
             [
