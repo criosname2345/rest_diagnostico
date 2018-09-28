@@ -599,6 +599,7 @@ class DiagnosticosController extends ControllerBase
         //Arreglos
         $sumatoria = array();
         $tot_cat = array();
+        $set_resultados = array();
 
          $int_repuestas = diag\cc\IntentoRespuesta::find(['id_intento = ?0',
          'bind' => [ $intento->id_intento ],]); 
