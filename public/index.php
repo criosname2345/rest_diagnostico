@@ -9,7 +9,7 @@ use Phalcon\Db\Adapter\Pdo\Postgresql;
 use Phalcon\Http\Response;
 use Phalcon\Events\Event;
 use Phalcon\Events\Manager as EventsManager;
-
+// global $config;
 error_reporting(E_ALL);
 
 define('BASE_PATH', dirname(__DIR__));
@@ -30,6 +30,7 @@ try {
        [
            APP_PATH . '/controllers/',
            APP_PATH . '/models/',
+        //    $config->application->libraryDir."PHPExcel/",
        ]
    );
    

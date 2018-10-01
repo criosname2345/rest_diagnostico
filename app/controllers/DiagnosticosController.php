@@ -3,6 +3,8 @@
 use Phalcon\Mvc\Controller;
 use Phalcon\Http\Response;
 
+require_once 'functions/excel.php';
+
 class DiagnosticosController extends ControllerBase
 {
 
@@ -673,6 +675,59 @@ class DiagnosticosController extends ControllerBase
         
         return $response;            
         
+    }
+
+    public function listar_excel(){
+        // Crear una respuesta
+        $response = new Response();
+        if ($this->request->isPost()) {
+                $json = $this->request->getJsonRawBody();
+                $loger = $this->validar_logueo($json->token);
+                if (!$loger){
+                    // Cambiar el HTTP status
+                    $response->setStatusCode(409, 'Conflict');
+                    $response->setJsonContent(
+                        [
+                            'status'   => 'ERROR',
+                            'messages' => 'Usuario no ha sido autenticado',
+                        ]
+                    );
+                    return $response;
+            }
+        }else{
+                $response->setStatusCode(404, 'Not Found');
+                return $response;
+        }
+
+        $excel = new PHPExcel(); 
+        //Usamos el worsheet por defecto 
+        $sheet = $excel->getActiveSheet(); 
+        //creamos nuestro array con los estilos para titulos 
+        $h1 = array(
+        'font' => array(
+            'bold' => true, 
+            'size' => 8, 
+            'name' => 'Tahoma'
+        ), 
+        'borders' => array(
+            'allborders' => array(
+            'style' => 'thin'
+            )
+        ), 
+        'alignment' => array(
+            'vertical' => 'center', 
+            'horizontal' => 'center'
+        )
+        ); 
+        //Agregamos texto en las celdas 
+
+        $sheet->setCellValue('A1', 'Prueba'); 
+        $sheet->setCellValue('B1', 'MatrixDevelopments'); 
+        //Damos formato o estilo a nuestras celdas 
+        $sheet->getStyle('A1:B1')->applyFromArray($h1); 
+        //exportamos nuestro documento 
+        $writer = new PHPExcel_Writer_Excel5($excel); 
+        $writer->save('prueba1.xls');
     }
 
 }

@@ -53,5 +53,6 @@ $Diagnostico->post('/grabar_respuestas', 'grabar_resp_intento');
 $Diagnostico->post('/intentos', 'listar_intentos');
 $Diagnostico->post('/resp_int', 'obt_respuestas_intento');
 $Diagnostico->post('/p_cat', 'puntear_categorias');
+$Diagnostico->post('/consulta_1', 'listar_excel');
 $app->mount($Diagnostico);
 
