@@ -3,8 +3,6 @@
 use Phalcon\Mvc\Controller;
 use Phalcon\Http\Response;
 
-require_once 'functions/excel.php';
-
 class DiagnosticosController extends ControllerBase
 {
 
@@ -699,35 +697,69 @@ class DiagnosticosController extends ControllerBase
                 return $response;
         }
 
-        $excel = new PHPExcel(); 
-        //Usamos el worsheet por defecto 
-        $sheet = $excel->getActiveSheet(); 
-        //creamos nuestro array con los estilos para titulos 
-        $h1 = array(
-        'font' => array(
-            'bold' => true, 
-            'size' => 8, 
-            'name' => 'Tahoma'
-        ), 
-        'borders' => array(
-            'allborders' => array(
-            'style' => 'thin'
-            )
-        ), 
-        'alignment' => array(
-            'vertical' => 'center', 
-            'horizontal' => 'center'
-        )
-        ); 
-        //Agregamos texto en las celdas 
+        // $excel = new PHPExcel(); 
+        // //Usamos el worsheet por defecto 
+        // $sheet = $excel->getActiveSheet(); 
+        // //creamos nuestro array con los estilos para titulos 
+        // $h1 = array(
+        // 'font' => array(
+        //     'bold' => true, 
+        //     'size' => 8, 
+        //     'name' => 'Tahoma'
+        // ), 
+        // 'borders' => array(
+        //     'allborders' => array(
+        //     'style' => 'thin'
+        //     )
+        // ), 
+        // 'alignment' => array(
+        //     'vertical' => 'center', 
+        //     'horizontal' => 'center'
+        // )
+        // ); 
+        // //Agregamos texto en las celdas 
 
-        $sheet->setCellValue('A1', 'Prueba'); 
-        $sheet->setCellValue('B1', 'MatrixDevelopments'); 
-        //Damos formato o estilo a nuestras celdas 
-        $sheet->getStyle('A1:B1')->applyFromArray($h1); 
-        //exportamos nuestro documento 
-        $writer = new PHPExcel_Writer_Excel5($excel); 
-        $writer->save('prueba1.xls');
+        // $sheet->setCellValue('A1', 'Prueba'); 
+        // $sheet->setCellValue('B1', 'MatrixDevelopments'); 
+        // //Damos formato o estilo a nuestras celdas 
+        // $sheet->getStyle('A1:B1')->applyFromArray($h1); 
+        // //exportamos nuestro documento 
+        // $writer = new PHPExcel_Writer_Excel2007($excel); 
+        // $writer->save('prueba1.xls');
+
+        $objPHPExcel = new PHPExcel();
+        $objPHPExcel->getActiveSheet()->setTitle('test worksheet');
+        $objPHPExcel->setActiveSheetIndex(0)
+            ->setCellValue('A1', 'Rezultati pretrage')
+            ->setCellValue('A2', "Ime")
+            ->setCellValue('C2', "Prezime")
+            ->setCellValue('F2', "Adresa stanovanja");
+    
+        // file name to output
+        $fname = date("Ymd_his") . ".xlsx";
+    
+        // temp file name to save before output
+        $temp_file = tempnam(sys_get_temp_dir(), 'phpexcel');
+    
+        $objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
+        $objWriter->save($temp_file);
+
+        // Redirect output to a client’s web browser (Excel2007)
+        $response->setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->setHeader('Content-Disposition', 'attachment;filename="' . $fname . '"');
+        $response->setHeader('Cache-Control', 'max-age=0');
+
+        // If you're serving to IE 9, then the following may be needed
+        $response->setHeader('Cache-Control', 'max-age=1');
+
+        //Set the content of the response
+        $response->setContent(file_get_contents($temp_file));
+
+        // delete temp file
+        unlink($temp_file);
+
+        //Return the response
+        return $response;
     }
 
 }

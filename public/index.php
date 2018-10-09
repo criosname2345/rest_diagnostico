@@ -9,11 +9,12 @@ use Phalcon\Db\Adapter\Pdo\Postgresql;
 use Phalcon\Http\Response;
 use Phalcon\Events\Event;
 use Phalcon\Events\Manager as EventsManager;
-// global $config;
 error_reporting(E_ALL);
 
 define('BASE_PATH', dirname(__DIR__));
 define('APP_PATH', BASE_PATH . '/app');
+
+// global $config;
 
 try {
 
@@ -30,7 +31,7 @@ try {
        [
            APP_PATH . '/controllers/',
            APP_PATH . '/models/',
-        //    $config->application->libraryDir."PHPExcel/",
+           APP_PATH . '/library/'."PHPExcel/Classes/",
        ]
    );
    
@@ -70,20 +71,43 @@ try {
 $app->get(
    '/api/usuarios',
    function () use ($app) {
-       $phql = 'SELECT * FROM syl\usuario\Usuario ORDER BY nombre';
 
-       $usuarios = $app->modelsManager->executeQuery($phql);
+    $response = new Response();
 
-       $data = [];
+    $objPHPExcel = new PHPExcel();
+    $objPHPExcel->getActiveSheet()->setTitle('test worksheet');
+    $objPHPExcel->setActiveSheetIndex(0)
+        ->setCellValue('A1', 'Rezultati pretrage')
+        ->setCellValue('A2', "Ime")
+        ->setCellValue('C2', "Prezime")
+        ->setCellValue('F2', "Adresa stanovanja");
 
-       foreach ($usuarios as $usuario) {
-           $data[] = [
-               'id_usuario'   => $usuario->id_usuario,
-               'nombre'       => $usuario->nombre,
-           ];
-       }
+    // file name to output
+    $fname = date("Ymd_his") . ".xlsx";
 
-       echo json_encode($data);
+    // temp file name to save before output
+    $temp_file = tempnam(sys_get_temp_dir(), 'phpexcel');
+
+    $objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
+    $objWriter->save($temp_file);
+
+    // Redirect output to a client’s web browser (Excel2007)
+    $response->setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    $response->setHeader('Content-Disposition', 'attachment;filename="' . $fname . '"');
+    $response->setHeader('Cache-Control', 'max-age=0');
+
+    // If you're serving to IE 9, then the following may be needed
+    $response->setHeader('Cache-Control', 'max-age=1');
+
+    //Set the content of the response
+    $response->setContent(file_get_contents($temp_file));
+
+    // delete temp file
+    unlink($temp_file);
+
+    //Return the response
+    return $response;
+
    }
 );
 
