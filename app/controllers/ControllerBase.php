@@ -55,4 +55,9 @@ class ControllerBase extends Controller
 
         return $Camcom->id_diagnostico;
     }
+
+    public function validar_rol($rol){
+
+    }
+    
 }
