@@ -56,8 +56,13 @@ class ControllerBase extends Controller
         return $Camcom->id_diagnostico;
     }
 
-    public function validar_rol($rol){
+    public function obtener_rol(){
+
+        //traer rol del usuario
+        $us_ses = $this->session->get('usuario');
+
+        return $us_ses['rol'] ;
 
     }
-    
+
 }

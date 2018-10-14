@@ -697,7 +697,40 @@ class DiagnosticosController extends ControllerBase
                 return $response;
         }
 
-
+        $rol = $this->obtener_rol() ;
+        switch($rol){
+            //Consultor Funcional
+            case '1':
+                $response->setStatusCode(409, 'Conflict');
+                $response->setJsonContent(
+                    [
+                        'status'   => 'ERROR',
+                        'messages' => 'Consultor funcional no puede descargar reporte excel',
+                    ]
+                );
+                return $response;
+                break;
+            //Coordinador
+            case '2':
+                //Traer la empresa del usuario en sesion      
+                $empresa_usuario = $this->obtener_empresa();
+                //traer las empresas de la camara de comercio
+                $empresas_cc = diag\cc\Empresa::find(['camara_comercio = ?0',
+                'bind' => [ $empresa_usuario->camara_comercio ],]);                
+                break;
+            //Administrador
+            case '3':
+                if(isset($json->camara_comercio)){
+                    //traer las empresas de la camara de comercio del json
+                    $empresas_cc = diag\cc\Empresa::find(['camara_comercio = ?0',
+                    'bind' => [ $json->camara_comercio ],]);
+                    
+                }else{
+                    //Traer todas las empresas
+                    $empresas_cc = diag\cc\Empresa::find();
+                }
+                break;
+        }
 
         $excel = new PHPExcel(); 
         //Usamos el worsheet por defecto 
@@ -721,11 +754,6 @@ class DiagnosticosController extends ControllerBase
             'horizontal' => 'center'
         )
         ); 
-        //Traer la empresa del usuario en sesion
-        $empresa_usuario = $this->obtener_empresa();
-        //traer las empresas de la camara de comercio del usuario
-        $empresas_cc = diag\cc\Empresa::find(['camara_comercio = ?0',
-        'bind' => [ $empresa_usuario->camara_comercio ],]);
 
         //Agregamos texto en las celdas - Titulos
         $sheet->setCellValue('A1', 'Razon Social'); 
@@ -776,9 +804,6 @@ class DiagnosticosController extends ControllerBase
         // temp file name to save before output
         $temp_file = tempnam(sys_get_temp_dir(), 'phpexcel');
     
-        // $objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
-        // $objWriter->save($temp_file);
-
         // Redirect output to a client’s web browser (Excel2007)
         $response->setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         $response->setHeader('Content-Disposition', 'attachment;filename="' . $nombre_archivo . '"');
@@ -792,7 +817,7 @@ class DiagnosticosController extends ControllerBase
         $response->setJsonContent(
             [
                 'status'     => 'OK',
-                'messages'   => 'Empresas registradas para el consultor',
+                'messages'   => 'Empresas registradas',
                 'loc_archivo'   => $nombre_archivo,
             ]
         );  
@@ -801,6 +826,190 @@ class DiagnosticosController extends ControllerBase
 
         //Return the response
         return $response;
+    }
+
+    public function excel_vis_reg(){
+        // Crear una respuesta
+        $response = new Response();
+        if ($this->request->isPost()) {
+                $json = $this->request->getJsonRawBody();
+                $loger = $this->validar_logueo($json->token);
+                if (!$loger){
+                    // Cambiar el HTTP status
+                    $response->setStatusCode(409, 'Conflict');
+                    $response->setJsonContent(
+                        [
+                            'status'   => 'ERROR',
+                            'messages' => 'Usuario no ha sido autenticado',
+                        ]
+                    );
+                    return $response;
+            }
+        }else{
+                $response->setStatusCode(404, 'Not Found');
+                return $response;
+        }
+
+        $visitas = array();
+        $rol = $this->obtener_rol() ;
+        switch($rol){
+            //Consultor Funcional
+            case '1':
+                $response->setStatusCode(409, 'Conflict');
+                $response->setJsonContent(
+                    [
+                        'status'   => 'ERROR',
+                        'messages' => 'Consultor funcional no puede descargar reporte excel',
+                    ]
+                );
+                return $response;
+                break;
+            //Coordinador
+            case '2':
+                //Traer las visitas del usuario en sesion      
+                $empresa_usuario = $this->obtener_empresa();
+                //traer las visitas de la camara de comercio
+                $empresas_cc = diag\cc\Empresa::find(['camara_comercio = ?0',
+                'bind' => [ $empresa_usuario->camara_comercio ],]);     
+
+                foreach($empresas_cc as $empresa_cc){
+                    $visitas_emp = diag\cc\Visita::find(['id_empresa = ?0',
+                    'bind' => [ $empresa_cc->id_empresa ],]);
+                    foreach($visitas_emp as $vis_emp){
+                        $visitas[] = $vis_emp;
+                    }      
+                }
+                break;
+            //Administrador
+            case '3':
+                if(isset($json->camara_comercio)){
+                    //traer las empresas de la camara de comercio del json
+                    $empresas_cc = diag\cc\Empresa::find(['camara_comercio = ?0',
+                    'bind' => [ $empresa_usuario->camara_comercio ],]);     
+    
+                    foreach($empresas_cc as $empresa_cc){
+                        $visitas_emp = diag\cc\Visita::find(['id_empresa = ?0',
+                        'bind' => [ $empresa_cc->id_empresa ],]);   
+                        foreach($visitas_emp as $vis_emp){
+                            $visitas[] = $vis_emp;
+                        }  
+                    }
+                    
+                }else{
+                    //Traer todas las visitas
+                    $visitas = diag\cc\Visita::find();
+                }
+                break;
+        }
+
+        $salida_exc = array();
+
+        foreach ($visitas as $visita){
+            $usu_vis = diag\cc\Usuario::findfirst(['id_usuario = ?0',
+                'bind' => [ $visita->id_usuario ],]);   
+            $contacto = diag\cc\Contacto::findfirst(['id_contacto = ?0',
+            'bind' => [ $usu_vis->id_contacto ],]);   
+            $emp_visitada = diag\cc\Empresa::findfirst(['id_empresa = ?0',
+            'bind' => [ $visita->id_empresa ],]);
+            $cat_visitada = diag\cc\Categoria::findfirst(['id_categoria = ?0',
+            'bind' => [ $visita->id_categoria ],]);
+                
+            $salida_exc[] = ['id_visita' => $visita->id_visita,
+                             'fecha'     => $visita->fecha,
+                             'comentario' => $visita->comentario,
+                             'empresa' => $emp_visitada->razon_social,
+                             'nombre_con' => $contacto->nombre.' '.$contacto->p_apellido,
+                             'categoria' => $cat_visitada->titulo,
+                            ]; 
+        }
+        //Si no hay visitas registradas informar
+        if(empty($salida_exc)){
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'No existen visitas registradas para la consulta',
+                ]
+            );
+    
+            return $response;   
+        }
+        
+        $excel = new PHPExcel(); 
+        //Usamos el worsheet por defecto 
+        $sheet = $excel->getActiveSheet(); 
+        //Titulo del archivo
+        $sheet->setTitle('Visitas registradas');
+        //creamos nuestro array con los estilos para titulos 
+        $h1 = array(
+        'font' => array(
+            'bold' => true, 
+            'size' => 8, 
+            'name' => 'Tahoma'
+        ), 
+        'borders' => array(
+            'allborders' => array(
+            'style' => 'thin'
+            )
+        ), 
+        'alignment' => array(
+            'vertical' => 'center', 
+            'horizontal' => 'center'
+        )
+        ); 
+
+        //Agregamos texto en las celdas - Titulos
+        $sheet->setCellValue('A1', 'Fecha de la visita'); 
+        $sheet->setCellValue('B1', 'Empresa visitada'); 
+        $sheet->setCellValue('C1', 'Consultor visitante'); 
+        $sheet->setCellValue('D1', 'Categoría'); 
+        $sheet->setCellValue('E1', 'Observaciones de la visita'); 
+        //Damos formato o estilo a nuestras celdas 
+        $sheet->getStyle('A1:E1')->applyFromArray($h1); 
+
+        //Contador de posiciones, comienza en la fila 2
+        $pos_cont = 2;
+        //Posiciones de visitas
+        foreach($salida_exc as $sal_exc){
+
+            $sheet->setCellValue('A'.$pos_cont , $sal_exc['fecha']); 
+            $sheet->setCellValue('B'.$pos_cont , $sal_exc['empresa']); 
+            $sheet->setCellValue('C'.$pos_cont , $sal_exc['nombre_con']); 
+            $sheet->setCellValue('D'.$pos_cont , $sal_exc['categoria']); 
+            $sheet->setCellValue('E'.$pos_cont , $sal_exc['comentario']); 
+            $pos_cont ++;
+        }
+
+        //exportamos nuestro documento 
+        $writer = new PHPExcel_Writer_Excel2007($excel); 
+        $nombre_archivo = 'temp/Visitas'. date("Ymd_his") . ".xlsx";
+        $writer->save($nombre_archivo);
+    
+        // temp file name to save before output
+        $temp_file = tempnam(sys_get_temp_dir(), 'phpexcel');
+    
+        // Redirect output to a client’s web browser (Excel2007)
+        $response->setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->setHeader('Content-Disposition', 'attachment;filename="' . $nombre_archivo . '"');
+        $response->setHeader('Cache-Control', 'max-age=0');
+
+        // If you're serving to IE 9, then the following may be needed
+        $response->setHeader('Cache-Control', 'max-age=1');
+
+        //Set the content of the response
+        // $response->setContent(file_get_contents($temp_file));
+        $response->setJsonContent(
+            [
+                'status'     => 'OK',
+                'messages'   => 'Visitas registradas',
+                'loc_archivo'   => $nombre_archivo,
+            ]
+        );  
+        // delete temp file
+        unlink($temp_file);
+
+        //Return the response
+        return $response;        
+
     }
 
 }
