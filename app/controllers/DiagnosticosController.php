@@ -732,85 +732,85 @@ class DiagnosticosController extends ControllerBase
                 break;
         }
 
-        $excel = new PHPExcel(); 
-        //Usamos el worsheet por defecto 
-        $sheet = $excel->getActiveSheet(); 
-        //Titulo del archivo
-        $sheet->setTitle('Empresas registradas');
-        //creamos nuestro array con los estilos para titulos 
-        $h1 = array(
-        'font' => array(
-            'bold' => true, 
-            'size' => 8, 
-            'name' => 'Tahoma'
-        ), 
-        'borders' => array(
-            'allborders' => array(
-            'style' => 'thin'
-            )
-        ), 
-        'alignment' => array(
-            'vertical' => 'center', 
-            'horizontal' => 'center'
-        )
-        ); 
+        // $excel = new PHPExcel(); 
+        // //Usamos el worsheet por defecto 
+        // $sheet = $excel->getActiveSheet(); 
+        // //Titulo del archivo
+        // $sheet->setTitle('Empresas registradas');
+        // //creamos nuestro array con los estilos para titulos 
+        // $h1 = array(
+        // 'font' => array(
+        //     'bold' => true, 
+        //     'size' => 8, 
+        //     'name' => 'Tahoma'
+        // ), 
+        // 'borders' => array(
+        //     'allborders' => array(
+        //     'style' => 'thin'
+        //     )
+        // ), 
+        // 'alignment' => array(
+        //     'vertical' => 'center', 
+        //     'horizontal' => 'center'
+        // )
+        // ); 
 
-        //Agregamos texto en las celdas - Titulos
-        $sheet->setCellValue('A1', 'Razon Social'); 
-        $sheet->setCellValue('B1', 'Nit'); 
-        $sheet->setCellValue('C1', 'Afiliación'); 
-        $sheet->setCellValue('D1', 'Página Web'); 
-        $sheet->setCellValue('E1', 'Representante legal'); 
-        $sheet->setCellValue('F1', 'Gerencia general'); 
-        $sheet->setCellValue('G1', 'Dirección'); 
-        $sheet->setCellValue('H1', 'Ciudad'); 
-        $sheet->setCellValue('I1', 'Constitución'); 
-        $sheet->setCellValue('J1', 'Ccit'); 
-        $sheet->setCellValue('K1', 'Camara de comercio'); 
-        $sheet->setCellValue('L1', 'Actividad economica'); 
-        //Damos formato o estilo a nuestras celdas 
-        $sheet->getStyle('A1:L1')->applyFromArray($h1); 
+        // //Agregamos texto en las celdas - Titulos
+        // $sheet->setCellValue('A1', 'Razon Social'); 
+        // $sheet->setCellValue('B1', 'Nit'); 
+        // $sheet->setCellValue('C1', 'Afiliación'); 
+        // $sheet->setCellValue('D1', 'Página Web'); 
+        // $sheet->setCellValue('E1', 'Representante legal'); 
+        // $sheet->setCellValue('F1', 'Gerencia general'); 
+        // $sheet->setCellValue('G1', 'Dirección'); 
+        // $sheet->setCellValue('H1', 'Ciudad'); 
+        // $sheet->setCellValue('I1', 'Constitución'); 
+        // $sheet->setCellValue('J1', 'Ccit'); 
+        // $sheet->setCellValue('K1', 'Camara de comercio'); 
+        // $sheet->setCellValue('L1', 'Actividad economica'); 
+        // //Damos formato o estilo a nuestras celdas 
+        // $sheet->getStyle('A1:L1')->applyFromArray($h1); 
 
-        //Contador de posiciones, comienza en la fila 2
-        $pos_cont = 2;
-        //Posiciones de empresas
-        foreach($empresas_cc as $empresa_cc){
+        // //Contador de posiciones, comienza en la fila 2
+        // $pos_cont = 2;
+        // //Posiciones de empresas
+        // foreach($empresas_cc as $empresa_cc){
 
-            $sheet->setCellValue('A'.$pos_cont , $empresa_cc->razon_social); 
-            $sheet->setCellValue('B'.$pos_cont , $empresa_cc->nit); 
-            $sheet->setCellValue('C'.$pos_cont , $empresa_cc->afiliacion); 
-            $sheet->setCellValue('D'.$pos_cont , $empresa_cc->web); 
-            $sheet->setCellValue('E'.$pos_cont , $empresa_cc->repr_legal); 
-            $sheet->setCellValue('F'.$pos_cont , $empresa_cc->ger_general); 
-            $sheet->setCellValue('G'.$pos_cont , $empresa_cc->direccion); 
-            $sheet->setCellValue('H'.$pos_cont , $empresa_cc->ciudad); 
-            $sheet->setCellValue('I'.$pos_cont , $empresa_cc->constitucion); 
-            $sheet->setCellValue('J'.$pos_cont , $empresa_cc->ccit); 
-            if($empresa_cc->es_cc === '1'){
-                $sheet->setCellValue('K'.$pos_cont , 'Si'); 
-            }else{
-                $sheet->setCellValue('K'.$pos_cont , 'No'); 
-            } 
-            $sheet->setCellValue('L'.$pos_cont , $empresa_cc->actividad_economica); 
-            $pos_cont ++;
+        //     $sheet->setCellValue('A'.$pos_cont , $empresa_cc->razon_social); 
+        //     $sheet->setCellValue('B'.$pos_cont , $empresa_cc->nit); 
+        //     $sheet->setCellValue('C'.$pos_cont , $empresa_cc->afiliacion); 
+        //     $sheet->setCellValue('D'.$pos_cont , $empresa_cc->web); 
+        //     $sheet->setCellValue('E'.$pos_cont , $empresa_cc->repr_legal); 
+        //     $sheet->setCellValue('F'.$pos_cont , $empresa_cc->ger_general); 
+        //     $sheet->setCellValue('G'.$pos_cont , $empresa_cc->direccion); 
+        //     $sheet->setCellValue('H'.$pos_cont , $empresa_cc->ciudad); 
+        //     $sheet->setCellValue('I'.$pos_cont , $empresa_cc->constitucion); 
+        //     $sheet->setCellValue('J'.$pos_cont , $empresa_cc->ccit); 
+        //     if($empresa_cc->es_cc === '1'){
+        //         $sheet->setCellValue('K'.$pos_cont , 'Si'); 
+        //     }else{
+        //         $sheet->setCellValue('K'.$pos_cont , 'No'); 
+        //     } 
+        //     $sheet->setCellValue('L'.$pos_cont , $empresa_cc->actividad_economica); 
+        //     $pos_cont ++;
 
-        }
+        // }
 
-        //exportamos nuestro documento 
-        $writer = new PHPExcel_Writer_Excel2007($excel); 
-        $nombre_archivo = 'temp/Empresas'. date("Ymd_his") . ".xlsx";
-        $writer->save($nombre_archivo);
+        // //exportamos nuestro documento 
+        // $writer = new PHPExcel_Writer_Excel2007($excel); 
+        // $nombre_archivo = 'temp/Empresas'. date("Ymd_his") . ".xlsx";
+        // $writer->save($nombre_archivo);
     
-        // temp file name to save before output
-        $temp_file = tempnam(sys_get_temp_dir(), 'phpexcel');
+        // // temp file name to save before output
+        // $temp_file = tempnam(sys_get_temp_dir(), 'phpexcel');
     
-        // Redirect output to a client’s web browser (Excel2007)
-        $response->setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $response->setHeader('Content-Disposition', 'attachment;filename="' . $nombre_archivo . '"');
-        $response->setHeader('Cache-Control', 'max-age=0');
+        // // Redirect output to a client’s web browser (Excel2007)
+        // $response->setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        // $response->setHeader('Content-Disposition', 'attachment;filename="' . $nombre_archivo . '"');
+        // $response->setHeader('Cache-Control', 'max-age=0');
 
-        // If you're serving to IE 9, then the following may be needed
-        $response->setHeader('Cache-Control', 'max-age=1');
+        // // If you're serving to IE 9, then the following may be needed
+        // $response->setHeader('Cache-Control', 'max-age=1');
 
         //Set the content of the response
         // $response->setContent(file_get_contents($temp_file));
@@ -818,11 +818,11 @@ class DiagnosticosController extends ControllerBase
             [
                 'status'     => 'OK',
                 'messages'   => 'Empresas registradas',
-                'loc_archivo'   => $nombre_archivo,
+                'loc_archivo'   => $empresas_cc,
             ]
         );  
         // delete temp file
-        unlink($temp_file);
+        // unlink($temp_file);
 
         //Return the response
         return $response;
