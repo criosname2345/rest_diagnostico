@@ -732,7 +732,7 @@ class DiagnosticosController extends ControllerBase
                 break;
         }
 
-        // $excel = new PHPExcel(); 
+        $excel = new PHPExcel(); 
         // //Usamos el worsheet por defecto 
         // $sheet = $excel->getActiveSheet(); 
         // //Titulo del archivo
@@ -818,7 +818,8 @@ class DiagnosticosController extends ControllerBase
             [
                 'status'     => 'OK',
                 'messages'   => 'Empresas registradas',
-                'loc_archivo'   => $empresas_cc,
+                'loc_archivo'   => $nombre_archivo,
+                'empresas'   => $empresas_cc
             ]
         );  
         // delete temp file
