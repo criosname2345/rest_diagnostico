@@ -55,5 +55,6 @@ $Diagnostico->post('/resp_int', 'obt_respuestas_intento');
 $Diagnostico->post('/p_cat', 'puntear_categorias');
 $Diagnostico->post('/exc_emp_reg', 'excel_emp_reg');
 $Diagnostico->post('/exc_vis_reg', 'excel_vis_reg');
+$Diagnostico->post('/exc_diag_reg', 'excel_diag_reg');
 $app->mount($Diagnostico);
 

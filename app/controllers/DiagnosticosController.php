@@ -885,7 +885,7 @@ class DiagnosticosController extends ControllerBase
                 if(isset($json->camara_comercio)){
                     //traer las empresas de la camara de comercio del json
                     $empresas_cc = diag\cc\Empresa::find(['camara_comercio = ?0',
-                    'bind' => [ $empresa_usuario->camara_comercio ],]);     
+                    'bind' => [ $json->camara_comercio ],]);     
     
                     foreach($empresas_cc as $empresa_cc){
                         $visitas_emp = diag\cc\Visita::find(['id_empresa = ?0',
@@ -1010,6 +1010,102 @@ class DiagnosticosController extends ControllerBase
         //Return the response
         return $response;        
 
+    }
+
+    public function excel_diag_reg(){
+        // Crear una respuesta
+        $response = new Response();
+        if ($this->request->isPost()) {
+                $json = $this->request->getJsonRawBody();
+                $loger = $this->validar_logueo($json->token);
+                if (!$loger){
+                    // Cambiar el HTTP status
+                    $response->setStatusCode(409, 'Conflict');
+                    $response->setJsonContent(
+                        [
+                            'status'   => 'ERROR',
+                            'messages' => 'Usuario no ha sido autenticado',
+                        ]
+                    );
+                    return $response;
+            }
+        }else{
+                $response->setStatusCode(404, 'Not Found');
+                return $response;
+        }
+
+        $intentos = array();
+        $rol = $this->obtener_rol() ;
+        $rol = 2;
+        switch($rol){
+            //Consultor Funcional
+            case '1':
+                $response->setStatusCode(409, 'Conflict');
+                $response->setJsonContent(
+                    [
+                        'status'   => 'ERROR',
+                        'messages' => 'Consultor funcional no puede descargar reporte excel',
+                    ]
+                );
+                return $response;
+                break;
+            //Coordinador
+            case '2':
+                //Traer los diagnosticos de la camara de comercio del usuario en sesion      
+                $empresa_usuario = $this->obtener_empresa();
+                //traer el diagnostico de la camara de comercio
+                $diag_cc = diag\cc\Diagnostico::findfirst(['id_empresa = ?0',
+                'bind' => [ $empresa_usuario->camara_comercio ],]); 
+                //Traer todos los intentos del diagnostico
+                $intentos = diag\cc\Intento::find(['id_diagnostico = ?0',
+                'bind'  => [ $diag_cc->id_diagnostico ],
+                'order' => 'id_empresa DESC',]);                
+
+                break;
+            //Administrador
+            case '3':
+                if(isset($json->camara_comercio)){
+                    //traer el diagnostico de la camara de comercio del json
+                    $diag_cc = diag\cc\Diagnostico::findfirst(['id_empresa = ?0',
+                    'bind' => [ $json->camara_comercio ],]); 
+                    //Traer todos los intentos del diagnostico
+                    $intentos = diag\cc\Intento::find(['id_diagnostico = ?0',
+                    'bind'  => [ $diag_cc->id_diagnostico ],
+                    'order' => 'id_empresa DESC',]);   
+                    
+                }else{
+                    //Traer todas las visitas
+                    $intentos = diag\cc\Intento::find(['order' => 'id_empresa DESC',]);
+                }
+                break;
+        }    
+
+        $salida_exc = array();
+        
+        foreach($intentos as $intento){
+
+            $emp_int = diag\cc\Empresa::findfirst(['id_empresa = ?0',
+            'bind' => [ $intento->id_empresa ],]);
+
+            $salida_exc[] = ['id_intento' => $intento->id_intento,
+                            'fecha'       => $intento->fecha,
+                            'resultado'   => $intento->resultado,
+                            'empresa'     => $emp_int->razon_social,
+                            ]; 
+
+        }
+       
+        $response->setJsonContent(
+            [
+                'status'     => 'OK',
+                'messages'   => 'Visitas registradas',
+                'loc_archivo'   => $empresa_usuario->camara_comercio,
+            ]
+        );  
+
+        //Return the response
+        return $response;        
+        
     }
 
 }
