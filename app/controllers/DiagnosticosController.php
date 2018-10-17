@@ -798,7 +798,7 @@ class DiagnosticosController extends ControllerBase
 
         //exportamos nuestro documento 
         $writer = new PHPExcel_Writer_Excel2007($excel); 
-        $nombre_archivo = 'temp/Empresas'. date("Ymd_his") . ".xlsx";
+        $nombre_archivo = 'temp/'. date("Ymd_his") . ".xlsx";
         $writer->save($nombre_archivo);
     
         // // temp file name to save before output
@@ -819,7 +819,7 @@ class DiagnosticosController extends ControllerBase
                 'status'     => 'OK',
                 'messages'   => 'Empresas registradas',
                 'loc_archivo'   => $nombre_archivo,
-                'empresas'   => $empresas_cc
+                // 'empresas'   => $empresas_cc
             ]
         );  
         // delete temp file
