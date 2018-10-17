@@ -799,7 +799,7 @@ class DiagnosticosController extends ControllerBase
         //exportamos nuestro documento 
         try{
             $writer = new PHPExcel_Writer_Excel2007($excel); 
-            $nombre_archivo = 'temp/'. date("Ymd_his") . ".xlsx";
+            $nombre_archivo = 'temp/Emp_'. date("Ymd_his") . ".xlsx";
             $writer->save($nombre_archivo);
         }catch(Exception $e){
             $response->setStatusCode(409, 'Conflict');
@@ -811,18 +811,17 @@ class DiagnosticosController extends ControllerBase
             );
             return $response;
         }
-
     
-        // // temp file name to save before output
+        // temp file name to save before output
         // $temp_file = tempnam(sys_get_temp_dir(), 'phpexcel');
     
-        // // Redirect output to a client’s web browser (Excel2007)
-        // $response->setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        // $response->setHeader('Content-Disposition', 'attachment;filename="' . $nombre_archivo . '"');
-        // $response->setHeader('Cache-Control', 'max-age=0');
+        // Redirect output to a client’s web browser (Excel2007)
+        $response->setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->setHeader('Content-Disposition', 'attachment;filename="' . $nombre_archivo . '"');
+        $response->setHeader('Cache-Control', 'max-age=0');
 
-        // // If you're serving to IE 9, then the following may be needed
-        // $response->setHeader('Cache-Control', 'max-age=1');
+        // If you're serving to IE 9, then the following may be needed
+        $response->setHeader('Cache-Control', 'max-age=1');
 
         //Set the content of the response
         // $response->setContent(file_get_contents($temp_file));
@@ -994,7 +993,7 @@ class DiagnosticosController extends ControllerBase
 
         //exportamos nuestro documento 
         $writer = new PHPExcel_Writer_Excel2007($excel); 
-        $nombre_archivo = 'temp/Visitas'. date("Ymd_his") . ".xlsx";
+        $nombre_archivo = 'temp/Vis_'. date("Ymd_his") . ".xlsx";
         $writer->save($nombre_archivo);
     
         // temp file name to save before output
@@ -1112,7 +1111,7 @@ class DiagnosticosController extends ControllerBase
             [
                 'status'     => 'OK',
                 'messages'   => 'Visitas registradas',
-                'loc_archivo'   => $empresa_usuario->camara_comercio,
+                'loc_archivo'   => $salida_exc,
             ]
         );  
 
