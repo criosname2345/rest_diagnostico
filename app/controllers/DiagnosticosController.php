@@ -797,9 +797,21 @@ class DiagnosticosController extends ControllerBase
         }
 
         //exportamos nuestro documento 
-        $writer = new PHPExcel_Writer_Excel2007($excel); 
-        $nombre_archivo = 'temp/'. date("Ymd_his") . ".xlsx";
-        $writer->save($nombre_archivo);
+        try{
+            $writer = new PHPExcel_Writer_Excel2007($excel); 
+            $nombre_archivo = 'temp/'. date("Ymd_his") . ".xlsx";
+            $writer->save($nombre_archivo);
+        }catch(Exception $e){
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'     => 'ERROR',
+                    'messages'   => $e->getMessage(),
+                ]
+            );
+            return $response;
+        }
+
     
         // // temp file name to save before output
         // $temp_file = tempnam(sys_get_temp_dir(), 'phpexcel');
