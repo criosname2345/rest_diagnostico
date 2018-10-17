@@ -1105,12 +1105,70 @@ class DiagnosticosController extends ControllerBase
                             ]; 
 
         }
+
+        $excel = new PHPExcel(); 
+        //Usamos el worsheet por defecto 
+        $sheet = $excel->getActiveSheet(); 
+        //Titulo del archivo
+        $sheet->setTitle('Diagnosticos registrados');
+        //creamos nuestro array con los estilos para titulos 
+        $h1 = array(
+        'font' => array(
+            'bold' => true, 
+            'size' => 8, 
+            'name' => 'Tahoma'
+        ), 
+        'borders' => array(
+            'allborders' => array(
+            'style' => 'thin'
+            )
+        ), 
+        'alignment' => array(
+            'vertical' => 'center', 
+            'horizontal' => 'center'
+        )
+        ); 
+
+        //Agregamos texto en las celdas - Titulos
+        $sheet->setCellValue('A1', 'Fecha del diagnostico'); 
+        $sheet->setCellValue('B1', 'Empresa'); 
+        $sheet->setCellValue('C1', 'Resultado obtenido'); 
+        //Damos formato o estilo a nuestras celdas 
+        $sheet->getStyle('A1:C1')->applyFromArray($h1); 
+
+        //Contador de posiciones, comienza en la fila 2
+        $pos_cont = 2;
+        //Posiciones de visitas
+        foreach($salida_exc as $sal_exc){
+
+            $sheet->setCellValue('A'.$pos_cont , $sal_exc['fecha']); 
+            $sheet->setCellValue('B'.$pos_cont , $sal_exc['empresa']); 
+            $sheet->setCellValue('C'.$pos_cont , $sal_exc['resultado']); 
+            $pos_cont ++;
+        }
+
+        //exportamos nuestro documento 
+        $writer = new PHPExcel_Writer_Excel2007($excel); 
+        $nombre_archivo = 'temp/Diag_'. date("Ymd_his") . ".xlsx";
+        $writer->save($nombre_archivo);
+    
+        // temp file name to save before output
+        // $temp_file = tempnam(sys_get_temp_dir(), 'phpexcel');
+    
+        // Redirect output to a client’s web browser (Excel2007)
+        $response->setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->setHeader('Content-Disposition', 'attachment;filename="' . $nombre_archivo . '"');
+        $response->setHeader('Cache-Control', 'max-age=0');
+
+        // If you're serving to IE 9, then the following may be needed
+        $response->setHeader('Cache-Control', 'max-age=1');
        
         $response->setJsonContent(
             [
                 'status'     => 'OK',
                 'messages'   => 'Diagnosticos registrados',
-                'loc_archivo'   => $salida_exc,
+                'loc_archivo'   => $nombre_archivo,
+                'salida'     => $salida_exc,
             ]
         );  
 
