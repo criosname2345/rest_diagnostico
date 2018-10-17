@@ -1048,7 +1048,6 @@ class DiagnosticosController extends ControllerBase
 
         $intentos = array();
         $rol = $this->obtener_rol() ;
-        $rol = 2;
         switch($rol){
             //Consultor Funcional
             case '1':
@@ -1110,7 +1109,7 @@ class DiagnosticosController extends ControllerBase
         $response->setJsonContent(
             [
                 'status'     => 'OK',
-                'messages'   => 'Visitas registradas',
+                'messages'   => 'Diagnosticos registrados',
                 'loc_archivo'   => $salida_exc,
             ]
         );  
