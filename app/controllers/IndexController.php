@@ -67,6 +67,10 @@ class IndexController extends ControllerBase
                 return $response;
             }
 
+            $this->session->remove('usuario');
+            // Destruye toda la sesión
+            $this->session->destroy();
+
             $response->setStatusCode(409, 'Conflict');
             $response->setJsonContent(
                 [
@@ -78,6 +82,23 @@ class IndexController extends ControllerBase
 
         }
 
+    }
+
+    public function salir(){
+        // Crear una respuesta
+        $response = new Response();       
+
+        $this->session->remove('usuario');
+        // Destruye toda la sesión
+        $this->session->destroy();
+
+        $response->setJsonContent(
+            [
+                'status'   => 'OK',
+                'messages' => 'Usuario salio exitosamente',
+            ]
+        );
+        return $response;
     }
 
 

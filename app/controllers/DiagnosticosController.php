@@ -2,6 +2,7 @@
 
 use Phalcon\Mvc\Controller;
 use Phalcon\Http\Response;
+use Phalcon\Security\Random;
 
 class DiagnosticosController extends ControllerBase
 {
@@ -243,56 +244,40 @@ class DiagnosticosController extends ControllerBase
         // Crear una respuesta
         $response = new Response();
         if ($this->request->isPost()) {
-                $json = $this->request->getJsonRawBody();
-                $loger = $this->validar_logueo($json->token);
-                if (!$loger){
-                    // Cambiar el HTTP status
-                    $response->setStatusCode(409, 'Conflict');
-                    $response->setJsonContent(
-                        [
-                            'status'   => 'ERROR',
-                            'messages' => 'Usuario no ha sido autenticado',
-                        ]
-                    );
-                    return $response;
+            $json = $this->request->getJsonRawBody();
+            $loger = $this->validar_logueo($json->token);
+            if (!$loger ){
+                $response->setStatusCode(409, 'Conflict');
+                $response->setJsonContent(
+                    [
+                        'status'   => 'ERROR',
+                        'messages' => 'Usuario no ha sido autenticado',
+                    ]
+                );
+                return $response;
             }
         }else{
                 $response->setStatusCode(404, 'Not Found');
                 return $response;
         }  
 
-        $preguntas = diag\cc\Pregunta::find(['id_diagnostico = ?0',
-        'bind' => [ $json->id_diagnostico ],]);
-
-        if(!isset($json->id_diagnostico) || $preguntas === false ){
+        $respuestas = array();
+        $respuestas = $this->obtener_preguntas_listar($json->id_diagnostico);
+        if(!isset($json->id_diagnostico) || empty($respuestas) ){
             $response->setStatusCode(409, 'Conflict');
             $response->setJsonContent(
                 [
                     'status'   => 'ERROR',
-                    'messages' => 'No existen preguntas para el id_diagnostico '.$json->id_diagnostico ,
+                    'messages' => 'No existen preguntas para el id_diagnostico '.$id_diagnostico ,
                 ]
                 ); 
             return $response;
         }
 
-        $respuestas = array();
-
-        foreach($preguntas as $pregunta){
-
-            $respuestas[] = [
-            'id_pregunta'    => $pregunta->id_pregunta ,
-            'tipo'           => $pregunta->tipo ,
-            'txt_pregunta'   => $pregunta->txt_pregunta ,
-            'id_diagnostico' => $pregunta->id_diagnostico ,
-            'respuestas' => diag\cc\OpcRespuesta::find(['id_pregunta = ?0',
-            'bind' => [ $pregunta->id_pregunta ],]), ];
-
-        }
-
         $response->setJsonContent(
             [
                 'status'   => 'OK',
-                'messages' => 'Preguntas diagnostico '.$json->id_diagnostico ,
+                'messages' => 'Preguntas diagnostico '.$id_diagnostico ,
                 'Preguntas' => $respuestas ,
             ]
             );         
@@ -323,8 +308,6 @@ class DiagnosticosController extends ControllerBase
                 return $response;
         }
         
-        $intento = new diag\cc\Intento();
-        $intento->fecha = date("Y-m-d");
         if($json->resultado > 100){
             $response->setStatusCode(409, 'Conflict');
             $response->setJsonContent(
@@ -334,8 +317,7 @@ class DiagnosticosController extends ControllerBase
                 ]
             );
             return $response;
-        }       
-        $intento->resultado = $json->resultado;
+        } 
         //traer empresa del usuario
         $us_ses = $this->session->get('usuario');
 
@@ -350,23 +332,12 @@ class DiagnosticosController extends ControllerBase
             return $response;
         }
 
-        $contacto = diag\cc\Contacto::findfirst(['id_contacto = ?0',
-        'bind' => [ $us_ses['id_contacto'] ],]);
+        // $contacto = diag\cc\Contacto::findfirst(['id_contacto = ?0',
+        // 'bind' => [ $us_ses['id_contacto'] ],]);
 
         $empresa_usuario = diag\cc\Empresa::findfirst(['id_empresa = ?0',
-        'bind' => [ $contacto->id_empresa ],]);
+        'bind' => [ $json->id_empresa ],]);
 
-        // //Si la empresa no es camara de comercio no puede crear intento diagnostico
-        // if($empresa_usuario->es_cc != 1){
-        //     $response->setStatusCode(409, 'Conflict');
-        //     $response->setJsonContent(
-        //         [
-        //             'status'   => 'ERROR',
-        //             'messages' => 'La empresa '.$empresa->razon_social.' no es camara de comercio',
-        //         ]
-        //     );
-        //     return $response;            
-        // }
         $CamCom = diag\cc\Empresa::findfirst($empresa_usuario->camara_comercio);
         //Validar que la camara de comercio de la empresa si tenga diagnostico
         if($CamCom->id_diagnostico == null){
@@ -380,7 +351,10 @@ class DiagnosticosController extends ControllerBase
             return $response;            
         }
 
-        $intento->id_diagnostico = $empresa_usuario->id_diagnostico;
+        $intento = new diag\cc\Intento();
+        $intento->fecha = date("Y-m-d");      
+        $intento->resultado = $json->resultado;
+        $intento->id_diagnostico = $CamCom->id_diagnostico;
         $intento->id_empresa =  $json->id_empresa;
 
         if ($intento->create() === false) {
@@ -1174,6 +1148,258 @@ class DiagnosticosController extends ControllerBase
 
         //Return the response
         return $response;        
+        
+    }
+
+    public function generar_link(){
+        // Crear una respuesta
+        $response = new Response();
+        if ($this->request->isPost()) {
+                $json = $this->request->getJsonRawBody();
+                $loger = $this->validar_logueo($json->token);
+                if (!$loger){
+                    // Cambiar el HTTP status
+                    $response->setStatusCode(409, 'Conflict');
+                    $response->setJsonContent(
+                        [
+                            'status'   => 'ERROR',
+                            'messages' => 'Usuario no ha sido autenticado',
+                        ]
+                    );
+                    return $response;
+            }
+        }else{
+                $response->setStatusCode(404, 'Not Found');
+                return $response;
+        }    
+
+        $random = new Random();
+        $link = new diag\cc\Link();
+        // Genera una cadena base64 de URL-segura con largo $len.
+        $len = 25;
+        $link->url = $random->base64Safe($len);
+        $link->id_empresa = $json->id_empresa;
+        $link->fecha          = date("Y-m-d");
+
+        if ($link->create() === false) {
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'No se ha podido crear el link',
+                    'Diagnostico'   => $json->id_diagnostico,
+                ]
+            );           
+        }else{
+
+            $response->setJsonContent(
+                [
+                    'status'   => 'OK',
+                    'messages' => 'Se registro correctamente el link',
+                    'Link'   => $link,
+                ]
+            );              
+        }     
+        
+        return $response;  
+    }
+
+    public function val_link_lp(){
+        // Crear una respuesta
+        $response = new Response();
+        if ($this->request->isPost()) {
+            $json = $this->request->getJsonRawBody();
+        }else{
+                $response->setStatusCode(404, 'Not Found');
+                return $response;
+        } 
+
+        if($json->url === null){
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'Link no validado',
+                ]
+            ); 
+            return $response;   
+        }
+
+        $link = diag\cc\Link::findfirst(['url = ?0',
+        'bind' => [ $json->url ],]);    
+        if($link === false){
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'Url no registrada',
+                    'url'      => $json->url,
+                ]
+            );             
+            return $response;   
+        }
+        if($link->diligenciado === 1){
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'Url ya fue diligenciada',
+                    'url'      => $json->url,
+                ]
+            );             
+            return $response; 
+        }
+        
+        $fecha_link   = date_create($link->fecha);
+        $fec_act      = date("Y-m-d");
+        $fecha_actual = date_create($fec_act);
+        $diff_dias = date_diff($fecha_link, $fecha_actual)->format('%a');
+        //Validar fecha del link
+        if($diff_dias > 0){
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'La url registrada ya expiro, por favor contactar con el consultor encargado',
+                    'url'      => $json->url,
+                ]
+            );             
+            return $response;   
+        }
+        //Consultar la camara de comercio de la empresa
+        $emp_cons = diag\cc\Empresa::findfirst(['id_empresa = ?0',
+        'bind' => [ $link->id_empresa ],]); 
+
+        $diagnostico = diag\cc\Diagnostico::findfirst(['id_empresa = ?0',
+        'bind' => [ $emp_cons->camara_comercio ],]); 
+
+        //Link Valido
+        $respuestas = array();
+        $respuestas = $this->obtener_preguntas_listar($diagnostico->id_diagnostico);
+        if(!isset($link) || empty($respuestas) ){
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'No existen preguntas para el id_diagnostico '.$diagnostico->id_diagnostico ,
+                ]
+                ); 
+            return $response;
+        }
+
+        $response->setJsonContent(
+            [
+                'status'   => 'OK',
+                'messages' => 'Preguntas diagnostico '.$id_diagnostico ,
+                'Preguntas' => $respuestas ,
+            ]
+            );         
+                                              
+        return $response;            
+
+    }
+
+    public function val_link_ri(){
+        // Crear una respuesta
+        $response = new Response();
+        if ($this->request->isPost()) {
+            $json = $this->request->getJsonRawBody();
+        }else{
+                $response->setStatusCode(404, 'Not Found');
+                return $response;
+        }
+        
+        if($json->url === null){
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'Link no validado',
+                ]
+            ); 
+            return $response;   
+        }
+
+        $link = diag\cc\Link::findfirst(['url = ?0',
+        'bind' => [ $json->url ],]);    
+        if($link === false){
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'Url no registrada',
+                    'url'      => $json->url,
+                ]
+            );             
+            return $response;   
+        }
+        if($link->diligenciado != 0){
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'Url ya fue diligenciada',
+                    'url'      => $json->url,
+                ]
+            );             
+            return $response; 
+        }
+
+        if($json->resultado > 100){
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'Resultado no puede ser mayor que 100',
+                ]
+            );
+            return $response;
+        } 
+
+        $empresa_usuario = diag\cc\Empresa::findfirst(['id_empresa = ?0',
+        'bind' => [ $link->id_empresa ],]);
+
+        $CamCom = diag\cc\Empresa::findfirst($empresa_usuario->camara_comercio);
+        //Validar que la camara de comercio de la empresa si tenga diagnostico
+        if($CamCom->id_diagnostico == null){
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'La camara de comercio '.$CamCom->razon_social.' no tiene diagnostico',
+                ]
+            );
+            return $response;            
+        }
+
+        $intento = new diag\cc\Intento();
+        $intento->fecha = date("Y-m-d");      
+        $intento->resultado = $json->resultado;
+        $intento->id_diagnostico = $CamCom->id_diagnostico;
+        $intento->id_empresa =  $link->id_empresa;
+
+        if ($intento->create() === false) {
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'No se ha podido grabar el intento',
+                    'intento'   => $intento,
+                ]
+            );           
+        }else{
+
+            $response->setJsonContent(
+                [
+                    'status'   => 'OK',
+                    'messages' => 'Se registro correctamente el intento',
+                    'intento'   => $intento,
+                ]
+            ); 
+            $link->diligenciado = 1; //Registrado intento
+            $link->update();        
+        }     
+        
+        return $response;    
         
     }
 

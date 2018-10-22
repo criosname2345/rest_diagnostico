@@ -65,4 +65,24 @@ class ControllerBase extends Controller
 
     }
 
+    public function obtener_preguntas_listar($id_diagnostico){
+
+        $preguntas = diag\cc\Pregunta::find(['id_diagnostico = ?0',
+        'bind' => [ $id_diagnostico ],]);
+
+        $respuestas = array();
+
+        foreach($preguntas as $pregunta){
+            $respuestas[] = [
+            'id_pregunta'    => $pregunta->id_pregunta ,
+            'tipo'           => $pregunta->tipo ,
+            'txt_pregunta'   => $pregunta->txt_pregunta ,
+            'id_diagnostico' => $pregunta->id_diagnostico ,
+            'respuestas' => diag\cc\OpcRespuesta::find(['id_pregunta = ?0',
+            'bind' => [ $pregunta->id_pregunta ],]), ];
+        }
+
+        return $respuestas;
+    }
+
 }

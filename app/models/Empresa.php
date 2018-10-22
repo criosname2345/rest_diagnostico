@@ -24,7 +24,7 @@ class Empresa extends \Phalcon\Mvc\Model
     /**
      *
      * @var string
-     * @Column(column="nit", type="string", length=12, nullable=false)
+     * @Column(column="nit", type="string", length=20, nullable=false)
      */
     protected $nit;
 

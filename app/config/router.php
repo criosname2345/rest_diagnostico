@@ -10,6 +10,7 @@ $Inicio->setHandler('IndexController', true);
 $Inicio->setPrefix('/api/index');
 // Usa el método 'obtener' en IndexController
 $Inicio->post('/aut', 'autenticar');
+$Inicio->get('/salir', 'salir');
 
 $app->mount($Inicio);
 
@@ -56,5 +57,8 @@ $Diagnostico->post('/p_cat', 'puntear_categorias');
 $Diagnostico->post('/exc_emp_reg', 'excel_emp_reg');
 $Diagnostico->post('/exc_vis_reg', 'excel_vis_reg');
 $Diagnostico->post('/exc_diag_reg', 'excel_diag_reg');
+$Diagnostico->post('/gen_link', 'generar_link');
+$Diagnostico->post('/link_lp', 'val_link_lp');
+$Diagnostico->post('/link_ri', 'val_link_ri');
 $app->mount($Diagnostico);
 
