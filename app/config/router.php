@@ -60,5 +60,6 @@ $Diagnostico->post('/exc_diag_reg', 'excel_diag_reg');
 $Diagnostico->post('/gen_link', 'generar_link');
 $Diagnostico->post('/link_lp', 'val_link_lp');
 $Diagnostico->post('/link_ri', 'val_link_ri');
+$Diagnostico->post('/link_gp', 'val_link_gp');
 $app->mount($Diagnostico);
 

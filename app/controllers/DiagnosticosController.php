@@ -1238,7 +1238,7 @@ class DiagnosticosController extends ControllerBase
             );             
             return $response;   
         }
-        if($link->diligenciado === 1){
+        if($link->diligenciado != 0){
             $response->setStatusCode(409, 'Conflict');
             $response->setJsonContent(
                 [
@@ -1344,6 +1344,22 @@ class DiagnosticosController extends ControllerBase
             return $response; 
         }
 
+        $fecha_link   = date_create($link->fecha);
+        $fec_act      = date("Y-m-d");
+        $fecha_actual = date_create($fec_act);
+        $diff_dias = date_diff($fecha_link, $fecha_actual)->format('%a');
+        //Validar fecha del link
+        if($diff_dias > 0){
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'La url registrada ya expiro, por favor contactar con el consultor encargado',
+                    'url'      => $json->url,
+                ]
+            );             
+            return $response;   
+        }
+
         if($json->resultado > 100){
             $response->setStatusCode(409, 'Conflict');
             $response->setJsonContent(
@@ -1401,6 +1417,108 @@ class DiagnosticosController extends ControllerBase
         
         return $response;    
         
+    }
+
+    public function val_link_gp(){
+        // Crear una respuesta
+        $response = new Response();
+        if ($this->request->isPost()) {
+            $json = $this->request->getJsonRawBody();
+        }else{
+                $response->setStatusCode(404, 'Not Found');
+                return $response;
+        }
+        
+        if($json->url === null){
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'Link no validado',
+                ]
+            ); 
+            return $response;   
+        }
+
+        $link = diag\cc\Link::findfirst(['url = ?0',
+        'bind' => [ $json->url ],]);    
+        if($link === false){
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'Url no registrada',
+                    'url'      => $json->url,
+                ]
+            );             
+            return $response;   
+        }
+        if($link->diligenciado != 1){
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'No se ha registrado intento o Url ya fue diligenciada',
+                    'url'      => $json->url,
+                ]
+            );             
+            return $response; 
+        }
+
+        $fecha_link   = date_create($link->fecha);
+        $fec_act      = date("Y-m-d");
+        $fecha_actual = date_create($fec_act);
+        $diff_dias = date_diff($fecha_link, $fecha_actual)->format('%a');
+        //Validar fecha del link
+        if($diff_dias > 0){
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'La url registrada ya expiro, por favor contactar con el consultor encargado',
+                    'url'      => $json->url,
+                ]
+            );             
+            return $response;   
+        }
+
+        $intento = diag\cc\Intento::findfirst(['id_intento = ?0',
+        'bind' => [ $json->id_intento ],]);
+        if($json->id_intento === null || $intento === false ){
+            $response->setStatusCode(409, 'Conflict');
+            $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'messages' => 'no existe el intento '.$json->id_intento,
+                ]
+            );
+            return $response;            
+        }
+        
+        $respuestas_grabadas = array();
+        $respuestas_errores = array();
+        foreach($json->respuestas as $respuesta_json){
+            $intento_resp = new diag\cc\IntentoRespuesta();
+            $intento_resp->id_respuesta = $respuesta_json->id_respuesta;
+            $intento_resp->id_intento = $json->id_intento;
+            if ($intento_resp->create() === false) {
+                $respuestas_errores[] = $respuesta_json->id_respuesta;
+            }else{
+                $respuestas_grabadas[] = $respuesta_json->id_respuesta;
+            }
+            unset($intento_resp);
+        }
+
+        $response->setJsonContent(
+            [
+                'status'   => 'OK',
+                'messages'              => 'Respuestas grabadas',
+                'respuestas_grabadas'   => $respuestas_grabadas,
+                'respuestas_errores'    => $respuestas_errores,
+            ]
+        );           
+        
+        return $response;   
+
     }
 
 }
