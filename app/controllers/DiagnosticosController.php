@@ -502,7 +502,7 @@ class DiagnosticosController extends ControllerBase
                  return $response;
          }
          
-         $intento = diag\cc\Intento::findFirst(['id_empresa = ?0',
+         $intento = diag\cc\Intento::findFirst(['id_intento = ?0',
          'bind' => [ $json->id_intento ],]);
          if (!isset($json->id_intento) || $intento === false){
             // Cambiar el HTTP status
@@ -521,7 +521,11 @@ class DiagnosticosController extends ControllerBase
 
         $respuestas = array();        
         foreach($respuestas_int as $int_res){
-            $respuestas[] = diag\cc\OpcRespuesta::findFirst($int_res->id_respuesta);
+            $respues = diag\cc\OpcRespuesta::findFirst($int_res->id_respuesta);
+            $respuestas[] = [
+                'id_respuesta' => $respues->id_respuesta,
+                'puntaje'      => $respues->puntaje,
+            ];
         }
 
         $response->setJsonContent(
