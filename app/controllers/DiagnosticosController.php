@@ -522,20 +522,94 @@ class DiagnosticosController extends ControllerBase
         $respuestas = array();        
         foreach($respuestas_int as $int_res){
             $respues = diag\cc\OpcRespuesta::findFirst($int_res->id_respuesta);
+            $preg    = diag\cc\Pregunta::findFirst($respues->id_pregunta);
             $respuestas[] = [
                 'id_respuesta' => $respues->id_respuesta,
                 'puntaje'      => $respues->puntaje,
+                'texto_res'    => $respues->texto,
+                'id_pregunta'  => $respues->id_pregunta,
+                'texto_pre'    => $preg->txt_pregunta,
+                'tipo_pre'     => $preg->tipo,
             ];
         }
 
+        // $response->setJsonContent(
+        //     [
+        //         'status'     => 'OK',
+        //         'messages'   => 'Respuestas del intento '.$intento->id_intento,
+        //         'respuestas'   => $respuestas,
+        //     ]
+        // );   
+        
+        $excel = new PHPExcel(); 
+        //Usamos el worsheet por defecto 
+        $sheet = $excel->getActiveSheet(); 
+        $titulo_arc = 'Respuesta del intento '.$json->id_intento;
+        //Titulo del archivo
+        $sheet->setTitle($titulo_arc);
+        //creamos nuestro array con los estilos para titulos 
+        $h1 = array(
+        'font' => array(
+            'bold' => true, 
+            'size' => 8, 
+            'name' => 'Tahoma'
+        ), 
+        'borders' => array(
+            'allborders' => array(
+            'style' => 'thin'
+            )
+        ), 
+        'alignment' => array(
+            'vertical' => 'center', 
+            'horizontal' => 'center'
+        )
+        ); 
+
+        //Agregamos texto en las celdas - Titulos
+        $sheet->setCellValue('A1', 'Pregunta'); 
+        $sheet->setCellValue('B1', 'Tipo'); 
+        $sheet->setCellValue('C1', 'Respuesta'); 
+        $sheet->setCellValue('D1', 'Puntaje'); 
+        //Damos formato o estilo a nuestras celdas 
+        $sheet->getStyle('A1:D1')->applyFromArray($h1); 
+
+        //Contador de posiciones, comienza en la fila 2
+        $pos_cont = 2;
+        //Posiciones de visitas
+        foreach($respuestas as $sal_exc){
+
+            $sheet->setCellValue('A'.$pos_cont , $sal_exc['texto_pre']); 
+            $sheet->setCellValue('B'.$pos_cont , $sal_exc['tipo_pre']); 
+            $sheet->setCellValue('C'.$pos_cont , $sal_exc['texto_res']); 
+            $sheet->setCellValue('D'.$pos_cont , $sal_exc['puntaje']); 
+            $pos_cont ++;
+        }
+
+        //exportamos nuestro documento 
+        $writer = new PHPExcel_Writer_Excel2007($excel); 
+        $nombre_archivo = 'temp/int_'.$json->id_intento.'_'. date("Ymd_his") . ".xlsx";
+        $writer->save($nombre_archivo);
+    
+        // temp file name to save before output
+        // $temp_file = tempnam(sys_get_temp_dir(), 'phpexcel');
+    
+        // Redirect output to a client’s web browser (Excel2007)
+        $response->setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->setHeader('Content-Disposition', 'attachment;filename="' . $nombre_archivo . '"');
+        $response->setHeader('Cache-Control', 'max-age=0');
+
+        // If you're serving to IE 9, then the following may be needed
+        $response->setHeader('Cache-Control', 'max-age=1');
+       
         $response->setJsonContent(
             [
                 'status'     => 'OK',
-                'messages'   => 'Respuestas del intento '.$intento->id_intento,
-                'respuestas'   => $respuestas,
+                'messages'   => $titulo_arc,
+                'loc_archivo'   => $nombre_archivo,
+                'salida'     => $respuestas,
             ]
-        );           
-        
+        );  
+
         return $response;     
     }
 
