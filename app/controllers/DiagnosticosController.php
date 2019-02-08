@@ -268,7 +268,7 @@ class DiagnosticosController extends ControllerBase
             $response->setJsonContent(
                 [
                     'status'   => 'ERROR',
-                    'messages' => 'No existen preguntas para el id_diagnostico '.$id_diagnostico ,
+                    'messages' => 'No existen preguntas para el id_diagnostico '.$json->id_diagnostico ,
                 ]
                 ); 
             return $response;
@@ -277,7 +277,7 @@ class DiagnosticosController extends ControllerBase
         $response->setJsonContent(
             [
                 'status'   => 'OK',
-                'messages' => 'Preguntas diagnostico '.$id_diagnostico ,
+                'messages' => 'Preguntas diagnostico '.$json->id_diagnostico ,
                 'Preguntas' => $respuestas ,
             ]
             );         
